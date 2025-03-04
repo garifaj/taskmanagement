@@ -107,5 +107,48 @@ namespace API.Helpers
             client.Send(message);
             client.Disconnect(true);
         }
+
+
+
+        public void SendProjectInvitationEmail(string email, int projectId, string inviteToken, string role)
+        {
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(
+                _config["EmailSettings:SenderName"],
+                _config["EmailSettings:SenderEmail"]
+            ));
+            message.To.Add(MailboxAddress.Parse(email));
+            message.Subject = "Project Invitation";
+
+            string confirmationUrl = $"http://localhost:5173/confirm-invite?email={System.Web.HttpUtility.UrlEncode(email)}&projectId={projectId}&token={System.Web.HttpUtility.UrlEncode(inviteToken)}&role={Uri.EscapeDataString(role)}";
+
+            var bodyBuilder = new BodyBuilder
+            {
+                HtmlBody = $@"
+        <p>Hi,</p>
+        <p>You have been invited to join a project as a <b>{role}</b>. Click the link below to accept:</p>
+        <a href='{confirmationUrl}'>Join Project</a>
+        <p>If you don't have an account, you'll need to register first.</p>
+        <p>Thanks,</p>
+        <p>Manage Support Team</p>"
+            };
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            using var client = new SmtpClient();
+            client.Connect(
+                _config["EmailSettings:SmtpServer"],
+                int.Parse(_config["EmailSettings:SmtpPort"]),
+                SecureSocketOptions.StartTls
+            );
+            client.Authenticate(
+                _config["EmailSettings:SenderEmail"],
+                _config["EmailSettings:AppPassword"]
+            );
+
+            client.Send(message);
+            client.Disconnect(true);
+        }
+
     }
 }

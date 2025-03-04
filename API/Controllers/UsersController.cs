@@ -33,22 +33,66 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users
+            .Select(u => new
+            {
+                u.Id,
+                u.Name,
+                u.Surname,
+                u.Email,
+                u.isSuperAdmin,
+                u.IsEmailVerified,
+                Projects = _context.ProjectUsers
+                    .Where(pu => pu.UserId == u.Id)
+                    .Include(pu => pu.Project)
+                    .Select(pu => new
+                    {
+                        pu.Project.Id,
+                        pu.Project.Title,
+                        pu.Role // User's role in the project
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
+
+                return Ok(users);
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .Where(u => u.Id == id)
+                .Select(u => new
+                {
+                    u.Id,
+                    u.Name,
+                    u.Surname,
+                    u.Email,
+                    u.isSuperAdmin,
+                    u.IsEmailVerified,
+                    Projects = _context.ProjectUsers
+                        .Where(pu => pu.UserId == u.Id)
+                        .Include(pu => pu.Project)
+                        .Select(pu => new
+                        {
+                            pu.Project.Id,
+                            pu.Project.Title,
+                            pu.Role
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return Ok(user);
         }
+
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

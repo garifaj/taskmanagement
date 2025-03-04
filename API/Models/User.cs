@@ -17,5 +17,6 @@ namespace API.Models
         public bool IsEmailVerified { get; set; }
         public string? VerificationToken { get; set; }
         public DateTime? VerificationTokenExpiry { get; set; }
+        public ICollection<ProjectUser> ProjectUsers { get; set; }
     }
 }
