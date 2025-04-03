@@ -142,6 +142,14 @@ const LoginPage = () => {
                   <p className="text-red-600 text-sm mt-1">{errors.password}</p>
                 )}
               </div>
+              <div className="col-span-6 text-left">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-blue-700 font-medium"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                 <button
                   type="submit"
