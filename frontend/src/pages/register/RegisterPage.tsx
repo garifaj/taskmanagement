@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import API_BASE_URL from "../../utils/config";
 import { RegisterErrors } from "../../context/types";
 import TogglePasswordBtn from "../../components/TogglePasswordBtn";
+import { Slide, toast, ToastContainer } from "react-toastify";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -60,19 +61,28 @@ const RegisterPage = () => {
     }
 
     try {
-      await axios.post(`${API_BASE_URL}/register`, {
-        name,
-        surname,
-        email,
-        password,
-      });
+      await axios
+        .post(`${API_BASE_URL}/register`, {
+          name,
+          surname,
+          email,
+          password,
+        })
+        .then(() => {
+          toast.success(
+            "Registration successful! Please check your email to verify your account.",
+            {
+              onClose: () => navigate("/login"),
+            }
+          );
+        });
+
       setName("");
       setSurname("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
       setErrors({});
-      navigate("/login");
     } catch (error) {
       console.error(error);
     }
@@ -80,6 +90,14 @@ const RegisterPage = () => {
 
   return (
     <section className="bg-white">
+      <ToastContainer
+        position="top-center"
+        autoClose={900}
+        hideProgressBar={false}
+        pauseOnHover={false}
+        theme="light"
+        transition={Slide}
+      />
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
         <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
           <img

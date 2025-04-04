@@ -6,6 +6,7 @@ import LandingPage from "./pages/landing/LandingPage";
 import { UserContextProvider } from "./context/UserContextProvider";
 import ForgotPasswordPage from "./pages/forgotpassword/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/forgotpassword/ResetPasswordPage";
+import VerifyEmailPage from "./pages/verifyemail/VerifyEmailPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
       </Routes>
     </UserContextProvider>
   );
