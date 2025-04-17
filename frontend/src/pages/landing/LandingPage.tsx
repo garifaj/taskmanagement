@@ -1,11 +1,17 @@
-import { useContext } from "react";
-import { UserContext } from "../../context/UserContext";
+import AboutUs from "./AboutUs";
+import Footer from "./Footer";
+import Hero from "./Hero";
+import Navbar from "./Navbar";
+import Testimonials from "./Testimonials";
 
 const LandingPage = () => {
-  const { user } = useContext(UserContext);
   return (
     <>
-      <h1>Hello {user?.name}</h1>
+      <Navbar />
+      <Hero />
+      <AboutUs />
+      <Testimonials />
+      <Footer />
     </>
   );
 };
