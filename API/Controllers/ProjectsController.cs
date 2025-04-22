@@ -57,6 +57,37 @@ namespace API.Controllers
             return Ok(projects);
         }
 
+        // Get projects for logged in user
+        [HttpGet("user-projects")]
+        public IActionResult GetProjectsForUser()
+        {
+            try
+            {
+                var jwt = Request.Cookies["jwt"];
+                var token = _jwtService.Verify(jwt);
+                int userId = int.Parse(token.Issuer);
+
+                var projectUsers = _context.ProjectUsers
+                    .Include(pu => pu.Project)
+                    .Where(pu => pu.UserId == userId)
+                    .Select(pu => new
+                    {
+                        pu.Project.Id,
+                        pu.Project.Title,
+                        pu.Project.Description,
+                        pu.Project.CreatedAt
+                    })
+                    .ToList();
+
+                return Ok(projectUsers);
+            }
+            catch (Exception)
+            {
+                return Unauthorized();
+            }
+        }
+
+
         // GET: api/Projects/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Project>> GetProject(int id)

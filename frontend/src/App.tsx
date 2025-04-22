@@ -7,6 +7,8 @@ import { UserContextProvider } from "./context/UserContextProvider";
 import ForgotPasswordPage from "./pages/forgotpassword/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/forgotpassword/ResetPasswordPage";
 import VerifyEmailPage from "./pages/verifyemail/VerifyEmailPage";
+import DashboardLayout from "./pages/dashboard/DashboardLayout";
+import DashboardMainPage from "./pages/dashboard/DashboardMainPage";
 
 function App() {
   return (
@@ -18,6 +20,9 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path="" element={<DashboardMainPage />} />
+        </Route>
       </Routes>
     </UserContextProvider>
   );

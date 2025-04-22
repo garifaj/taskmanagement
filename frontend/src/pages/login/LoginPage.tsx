@@ -55,7 +55,7 @@ const LoginPage = () => {
       setEmail("");
       setPassword("");
       setErrors({});
-      navigate("/");
+      navigate("/dashboard");
     } catch (error: unknown) {
       if (error instanceof AxiosError && error.response?.data?.message) {
         setErrors({

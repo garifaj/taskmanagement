@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Navbar = () => {
   return (
     <>
@@ -10,9 +12,12 @@ const Navbar = () => {
               alt="TaskFlow"
             />
             <div className="flex items-center space-x-4">
-              <button className="inline-block shrink-0 rounded-md border border-blue-500 bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:cursor-pointer hover:bg-transparent hover:text-blue-600">
+              <Link
+                to="/login"
+                className="inline-block shrink-0 rounded-md border border-blue-500 bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:cursor-pointer hover:bg-transparent hover:text-blue-600"
+              >
                 Get Started
-              </button>
+              </Link>
             </div>
           </div>
         </div>

@@ -13,6 +13,7 @@
     "@glidejs/glide": "^3.7.1",
     "@tailwindcss/vite": "^4.1.1",
     "axios": "^1.8.4",
+    "bootstrap-icons": "^1.11.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.4.1",
