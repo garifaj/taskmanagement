@@ -1,37 +1,22 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
 import API_BASE_URL from "../../utils/config";
 import { Project } from "../../context/types";
+import { useProjectContext } from "../../hooks/useProjectContext";
+import NewProjectModal from "./NewProjectModal";
 
 type SidebarProps = {
   toggleSidebar: () => void;
 };
 
 const Sidebar = ({ toggleSidebar }: SidebarProps) => {
-  const [projects, setProjects] = useState<Project[]>([]);
   const { setUser } = useContext(UserContext);
   const [isDropdownOpen, setDropdownOpen] = useState(true);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchUserProjects = async () => {
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}/projects/user-projects`,
-          {
-            withCredentials: true,
-          }
-        );
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      }
-    };
-
-    fetchUserProjects();
-  }, []);
+  const { projects, fetchUserProjects } = useProjectContext();
 
   const handleLogout = async () => {
     await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
@@ -94,6 +79,7 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
 
             <button
               type="button"
+              onClick={() => setShowModal(true)}
               className="mt-2 flex items-center rounded py-1.5 px-4 text-sm font-medium text-left text-blue-600 transition-colors duration-300 hover:text-blue-400 focus:outline-none cursor-pointer"
             >
               <svg
@@ -126,6 +112,11 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
           </button>
         </div>
       </div>
+      <NewProjectModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        refreshProjects={fetchUserProjects}
+      />
     </>
   );
 };

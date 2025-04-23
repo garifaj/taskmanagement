@@ -1,25 +1,16 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import API_BASE_URL from "../../utils/config";
+import { toast } from "react-toastify";
 import { Project } from "../../context/types";
+import { useProjectContext } from "../../hooks/useProjectContext";
 
 const ProjectsTable = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const { projects, deleteProject } = useProjectContext();
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/projects/user-projects`, {
-          withCredentials: true,
-        });
-        setProjects(res.data);
-      } catch (error) {
-        console.error("Failed to fetch projects:", error);
-      }
-    };
-
-    fetchProjects();
-  }, []);
+  const handleDelete = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      deleteProject(id); // Call the delete function from context
+    }
+    toast.info("Project deleted successfully");
+  };
 
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-300">
@@ -45,11 +36,14 @@ const ProjectsTable = () => {
               <td className="px-3 py-2 whitespace-nowrap text-gray-900">
                 {new Date(project.createdAt).toLocaleDateString()}
               </td>
-              <td className=" py-2 whitespace-nowrap">
+              <td className="py-2 whitespace-nowrap">
                 <button className="px-2 py-1 text-sm bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 hover:cursor-pointer">
                   <i className="bi bi-pencil-square"></i>
                 </button>
-                <button className="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 hover:cursor-pointer">
+                <button
+                  onClick={() => handleDelete(project.id)} // Trigger delete on click
+                  className="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 hover:cursor-pointer"
+                >
                   <i className="bi bi-trash3-fill"></i>
                 </button>
               </td>

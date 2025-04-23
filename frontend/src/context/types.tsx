@@ -40,3 +40,13 @@ export type LoginErrors = {
   email?: string;
   password?: string;
 };
+
+export type NewProjectModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  refreshProjects: () => void;
+};
+
+export type ProjectsTableProps = {
+  projects: Project[];
+};
