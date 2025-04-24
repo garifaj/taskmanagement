@@ -3,13 +3,13 @@ import "./App.css";
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import LandingPage from "./pages/landing/LandingPage";
-import { UserContextProvider } from "./context/UserContextProvider";
+import { UserContextProvider } from "./context/user/UserContextProvider";
 import ForgotPasswordPage from "./pages/forgotpassword/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/forgotpassword/ResetPasswordPage";
 import VerifyEmailPage from "./pages/verifyemail/VerifyEmailPage";
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import DashboardMainPage from "./pages/dashboard/DashboardMainPage";
-import { ProjectContextProvider } from "./context/ProjectContextProvider";
+import { ProjectContextProvider } from "./context/project/ProjectContextProvider";
 
 function App() {
   return (

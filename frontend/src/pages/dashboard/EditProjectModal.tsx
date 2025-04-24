@@ -1,16 +1,25 @@
-import { useState } from "react";
-import { NewProjectModalProps } from "../../context/types";
-import axios from "axios";
+import { useEffect, useState } from "react";
+
 import API_BASE_URL from "../../utils/config";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { EditProjectModalProps } from "../../context/types";
 
-const NewProjectModal = ({
+const EditProjectModal = ({
   isOpen,
   onClose,
   refreshProjects,
-}: NewProjectModalProps) => {
+  selectedProject,
+}: EditProjectModalProps) => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+
+  useEffect(() => {
+    if (selectedProject) {
+      setTitle(selectedProject.title);
+      setDescription(selectedProject.description || "");
+    }
+  }, [selectedProject]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,20 +28,17 @@ const NewProjectModal = ({
       description,
     };
     await axios
-      .post(`${API_BASE_URL}/projects`, projectData, {
-        withCredentials: true,
-      })
+      .put(`${API_BASE_URL}/projects/${selectedProject?.id}`, projectData)
       .then(() => {
-        toast.success("Project created successfully!");
+        toast.success("Project edited successfully!");
         refreshProjects();
-
         setTitle("");
         setDescription("");
         onClose();
       })
-      .catch((error) => {
+      .catch((error: string) => {
         console.error("Error creating project:", error);
-        toast.error("Failed to create project. Please try again.");
+        toast.error("Failed to edit project. Please try again.");
       }); // Close the modal after submission
   };
 
@@ -41,7 +47,7 @@ const NewProjectModal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-        <h3 className="text-lg font-semibold mb-4">Create New Project</h3>
+        <h3 className="text-lg font-semibold mb-4">Edit project</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -80,7 +86,7 @@ const NewProjectModal = ({
               type="submit"
               className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700"
             >
-              Create
+              Edit
             </button>
           </div>
         </form>
@@ -89,4 +95,4 @@ const NewProjectModal = ({
   );
 };
 
-export default NewProjectModal;
+export default EditProjectModal;

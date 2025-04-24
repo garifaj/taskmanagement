@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API_BASE_URL from "../../utils/config";
 import { LoginErrors } from "../../context/types";
-import { UserContext } from "../../context/UserContext";
+import { UserContext } from "../../context/user/UserContext";
 import TogglePasswordBtn from "../../components/TogglePasswordBtn";
 
 const LoginPage = () => {

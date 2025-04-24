@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { UserContext } from "./UserContext";
-import { UserContextProviderProps, User } from "./types";
+import { UserContextProviderProps, User } from "../types.tsx";
 import axios from "axios";
-import API_BASE_URL from "../utils/config.tsx";
+import API_BASE_URL from "../../utils/config.tsx";
 
 export function UserContextProvider({ children }: UserContextProviderProps) {
   const [user, setUser] = useState<User | null>(null);

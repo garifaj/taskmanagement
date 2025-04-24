@@ -1,14 +1,17 @@
 import { useContext, useState } from "react";
-import { UserContext } from "../../context/UserContext";
+import { UserContext } from "../../context/user/UserContext";
 import ProjectsTable from "./ProjectsTable";
 import NewProjectModal from "./NewProjectModal";
 import { Slide, ToastContainer } from "react-toastify";
 import { useProjectContext } from "../../hooks/useProjectContext";
+import EditProjectModal from "./EditProjectModal";
+import { Project } from "../../context/types";
 
 const DashboardMainPage = () => {
   const { user } = useContext(UserContext);
   const [showModal, setShowModal] = useState<boolean>(false);
   const { fetchUserProjects } = useProjectContext();
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   return (
     <>
       <ToastContainer
@@ -45,11 +48,23 @@ const DashboardMainPage = () => {
         </div>
       </div>
 
-      <ProjectsTable />
+      <ProjectsTable
+        setShowModal={setShowModal}
+        setSelectedProject={setSelectedProject}
+      />
       <NewProjectModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         refreshProjects={fetchUserProjects}
+      />
+      <EditProjectModal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedProject(null);
+        }}
+        refreshProjects={fetchUserProjects}
+        selectedProject={selectedProject}
       />
     </>
   );

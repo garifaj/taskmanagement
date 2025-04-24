@@ -1,11 +1,12 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../context/UserContext";
+import { UserContext } from "../../context/user/UserContext";
 import API_BASE_URL from "../../utils/config";
 import { Project } from "../../context/types";
 import { useProjectContext } from "../../hooks/useProjectContext";
 import NewProjectModal from "./NewProjectModal";
+import { PlusIcon } from "../../constants/icons";
 
 type SidebarProps = {
   toggleSidebar: () => void;
@@ -16,7 +17,7 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
   const [isDropdownOpen, setDropdownOpen] = useState(true);
   const [showModal, setShowModal] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { projects, fetchUserProjects } = useProjectContext();
+  const { userProjects, fetchUserProjects } = useProjectContext();
 
   const handleLogout = async () => {
     await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
@@ -67,7 +68,7 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
         {isDropdownOpen && (
           <>
             <div className="text-left text-sm mt-2 w-4/5 mx-auto text-gray-500  font-medium">
-              {projects.map((project: Project) => (
+              {userProjects.map((project: Project) => (
                 <h1
                   key={project.id}
                   className="cursor-pointer p-2 hover:bg-blue-500/10 rounded-md mt-1 hover:text-blue-500"
@@ -82,21 +83,7 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
               onClick={() => setShowModal(true)}
               className="mt-2 flex items-center rounded py-1.5 px-4 text-sm font-medium text-left text-blue-600 transition-colors duration-300 hover:text-blue-400 focus:outline-none cursor-pointer"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-
+              <PlusIcon />
               <span className="mx-2">Add new project</span>
             </button>
           </>

@@ -46,6 +46,12 @@ export type NewProjectModalProps = {
   onClose: () => void;
   refreshProjects: () => void;
 };
+export type EditProjectModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  refreshProjects: () => void;
+  selectedProject: Project | null;
+};
 
 export type ProjectsTableProps = {
   projects: Project[];

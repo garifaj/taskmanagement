@@ -1,9 +1,18 @@
 import { toast } from "react-toastify";
 import { Project } from "../../context/types";
 import { useProjectContext } from "../../hooks/useProjectContext";
+import { useEffect } from "react";
 
-const ProjectsTable = () => {
-  const { projects, deleteProject } = useProjectContext();
+type ProjectsTableProps = {
+  setShowModal: (value: boolean) => void;
+  setSelectedProject: (project: Project | null) => void;
+};
+const ProjectsTable = ({
+  setShowModal,
+  setSelectedProject,
+}: ProjectsTableProps) => {
+  const { userProjects, fetchUserProjects, deleteProject } =
+    useProjectContext();
 
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
@@ -11,6 +20,11 @@ const ProjectsTable = () => {
     }
     toast.info("Project deleted successfully");
   };
+
+  useEffect(() => {
+    fetchUserProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-300">
@@ -25,7 +39,7 @@ const ProjectsTable = () => {
         </thead>
 
         <tbody className="divide-y divide-gray-200">
-          {projects.map((project: Project) => (
+          {userProjects.map((project: Project) => (
             <tr key={project.id} className="bg-white hover:bg-gray-50">
               <td className="px-3 py-2 whitespace-nowrap font-medium text-gray-900">
                 {project.title}
@@ -37,7 +51,13 @@ const ProjectsTable = () => {
                 {new Date(project.createdAt).toLocaleDateString()}
               </td>
               <td className="py-2 whitespace-nowrap">
-                <button className="px-2 py-1 text-sm bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 hover:cursor-pointer">
+                <button
+                  onClick={() => {
+                    setSelectedProject(project);
+                    setShowModal(true);
+                  }}
+                  className="px-2 py-1 text-sm bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 hover:cursor-pointer"
+                >
                   <i className="bi bi-pencil-square"></i>
                 </button>
                 <button
