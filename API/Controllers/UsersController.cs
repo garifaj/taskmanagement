@@ -93,6 +93,17 @@ namespace API.Controllers
             return Ok(user);
         }
 
+        [HttpGet("exists")]
+        public async Task<IActionResult> CheckUserExists([FromQuery] string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return BadRequest("Email is required.");
+
+            var exists = await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower());
+
+            return Ok(new { exists });
+        }
+
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

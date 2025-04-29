@@ -10,6 +10,8 @@ import VerifyEmailPage from "./pages/verifyemail/VerifyEmailPage";
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import DashboardMainPage from "./pages/dashboard/DashboardMainPage";
 import { ProjectContextProvider } from "./context/project/ProjectContextProvider";
+import ProjectMainPage from "./pages/project/ProjectMainPage";
+import ConfirmInvitePage from "./pages/project/ConfirmInvitePage";
 
 function App() {
   return (
@@ -25,8 +27,10 @@ function App() {
             element={<ResetPasswordPage />}
           />
           <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
-          <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path="/confirm-invite" element={<ConfirmInvitePage />} />
+          <Route path="/dashboard/" element={<DashboardLayout />}>
             <Route path="" element={<DashboardMainPage />} />
+            <Route path="projects/:projectId" element={<ProjectMainPage />} />
           </Route>
         </Routes>
       </ProjectContextProvider>

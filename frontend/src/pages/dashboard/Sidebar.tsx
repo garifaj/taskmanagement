@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/user/UserContext";
 import API_BASE_URL from "../../utils/config";
@@ -29,6 +29,13 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
     setDropdownOpen(!isDropdownOpen);
   };
 
+  useEffect(() => {
+    if (userProjects.length === 0) {
+      fetchUserProjects(); // Re-fetch if empty (initial load or refresh)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <div className="sidebar h-screen p-2 overflow-y-auto text-center bg-white shadow-md rounded-md">
@@ -43,7 +50,10 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
           <div className="my-2 bg-gray-300 h-[1px]"></div>
         </div>
 
-        <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-500/10 text-gray-500 hover:text-blue-500">
+        <div
+          className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-500/10 text-gray-500 hover:text-blue-500"
+          onClick={() => navigate("")}
+        >
           <i className="bi bi-house-door-fill"></i>
           <span className="text-[15px] ml-4 font-medium">Dashboard</span>
         </div>
@@ -71,6 +81,7 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
               {userProjects.map((project: Project) => (
                 <h1
                   key={project.id}
+                  onClick={() => navigate(`projects/${project.id}`)}
                   className="cursor-pointer p-2 hover:bg-blue-500/10 rounded-md mt-1 hover:text-blue-500"
                 >
                   {project.title}

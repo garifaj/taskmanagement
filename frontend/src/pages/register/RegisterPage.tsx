@@ -1,15 +1,19 @@
 import axios from "axios";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import API_BASE_URL from "../../utils/config";
 import { RegisterErrors } from "../../context/types";
 import TogglePasswordBtn from "../../components/TogglePasswordBtn";
 import { Slide, toast, ToastContainer } from "react-toastify";
 
 const RegisterPage = () => {
+  const [searchParams] = useSearchParams();
+  const inviteToken = searchParams.get("token");
+  const emailFromInvite = searchParams.get("email");
+  const projectId = searchParams.get("projectId");
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(emailFromInvite || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -68,7 +72,16 @@ const RegisterPage = () => {
           email,
           password,
         })
-        .then(() => {
+        .then(async () => {
+          // Confirm invite if token exists
+          if (inviteToken) {
+            await axios.post(`${API_BASE_URL}/projectusers/confirm-invite`, {
+              inviteToken,
+              email,
+              projectId,
+            });
+          }
+
           toast.success(
             "Registration successful! Please check your email to verify your account.",
             {
@@ -177,6 +190,7 @@ const RegisterPage = () => {
                     if (errors.email)
                       setErrors((prev) => ({ ...prev, email: "" }));
                   }}
+                  disabled={!!emailFromInvite}
                   className={`mt-1 p-2 w-full rounded-md border ${
                     errors.email ? "border-red-500" : "border-gray-200"
                   }`}
