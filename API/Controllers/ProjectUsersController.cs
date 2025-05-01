@@ -111,6 +111,18 @@ namespace API.Controllers
 
             return Ok("User role updated.");
         }
+
+        [HttpGet("role")]
+        public async Task<IActionResult> GetUserRoleInProject([FromQuery] int projectId, [FromQuery] int userId)
+        {
+            var projectUser = await _context.ProjectUsers
+                .FirstOrDefaultAsync(pu => pu.ProjectId == projectId && pu.UserId == userId);
+
+            if (projectUser == null)
+                return NotFound("User not part of this project.");
+
+            return Ok(new { role = projectUser.Role });
+        }
     }
 
 

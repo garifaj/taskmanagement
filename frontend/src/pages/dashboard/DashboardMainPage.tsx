@@ -10,6 +10,7 @@ import { Project } from "../../context/types";
 const DashboardMainPage = () => {
   const { user } = useContext(UserContext);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const { fetchUserProjects } = useProjectContext();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   return (
@@ -49,7 +50,7 @@ const DashboardMainPage = () => {
       </div>
 
       <ProjectsTable
-        setShowModal={setShowModal}
+        setShowModal={setShowEditModal}
         setSelectedProject={setSelectedProject}
       />
       <NewProjectModal
@@ -58,9 +59,9 @@ const DashboardMainPage = () => {
         refreshProjects={fetchUserProjects}
       />
       <EditProjectModal
-        isOpen={showModal}
+        isOpen={showEditModal}
         onClose={() => {
-          setShowModal(false);
+          setShowEditModal(false);
           setSelectedProject(null);
         }}
         refreshProjects={fetchUserProjects}

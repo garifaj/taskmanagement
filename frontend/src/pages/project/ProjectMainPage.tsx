@@ -1,10 +1,13 @@
 import { useState } from "react";
 import InviteUserModal from "./InviteUserModal";
 import { useParams } from "react-router-dom";
+import { useProjectRole } from "../../hooks/useProjectRole";
 
 const ProjectMainPage = () => {
-  const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const { projectId } = useParams();
+  const { role, loading } = useProjectRole(projectId);
+
   return (
     <>
       <div className="mb-8 flex items-center justify-between">
@@ -21,14 +24,18 @@ const ProjectMainPage = () => {
             })}
           </p>
         </div>
-        <button
-          type="button"
-          className="inline-block rounded-md border border-blue-500 bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600"
-          onClick={() => setShowInviteModal(true)}
-        >
-          Invite User
-        </button>
+
+        {!loading && role === "admin" && (
+          <button
+            type="button"
+            className="inline-block rounded-md border border-blue-500 bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600"
+            onClick={() => setShowInviteModal(true)}
+          >
+            Invite User
+          </button>
+        )}
       </div>
+
       <InviteUserModal
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}

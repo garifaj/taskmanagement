@@ -190,7 +190,7 @@ namespace API.Controllers
                 {
                     ProjectId = project.Id,
                     UserId = user.Id,
-                    Role = "Admin" // Assign the creator as Admin
+                    Role = "admin" // Assign the creator as Admin
                 };
 
                 _context.ProjectUsers.Add(projectUser);
