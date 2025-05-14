@@ -12,6 +12,8 @@ export const ProjectContextProvider = ({
 }) => {
   const [userProjects, setUserProjects] = useState<Project[]>([]);
 
+  
+
   const fetchUserProjects = () => {
     axios
       .get(`${API_BASE_URL}/projects/user-projects`, { withCredentials: true })

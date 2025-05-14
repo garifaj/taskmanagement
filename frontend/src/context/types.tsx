@@ -7,6 +7,7 @@ export type User = {
   email: string;
   isSuperAdmin: boolean;
   isEmailVerified: boolean;
+  role?: string; // e.g., "admin", "user", etc.
   projects: Project[];
 };
 

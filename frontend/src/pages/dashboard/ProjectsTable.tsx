@@ -17,8 +17,8 @@ const ProjectsTable = ({
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       deleteProject(id); // Call the delete function from context
+      toast.info("Project deleted successfully");
     }
-    toast.info("Project deleted successfully");
   };
 
   useEffect(() => {
