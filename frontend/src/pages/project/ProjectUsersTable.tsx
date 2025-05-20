@@ -2,9 +2,11 @@ import { useParams } from "react-router-dom";
 import API_BASE_URL from "../../utils/config";
 import { User } from "../../context/types";
 import axios from "axios";
-import { toast } from "react-toastify";
-import { useContext } from "react";
+import { Slide, toast, ToastContainer } from "react-toastify";
+import { useContext, useState } from "react";
 import { UserContext } from "../../context/user/UserContext";
+import EditUserRoleModal from "./EditUserRoleModal";
+import { useProjectRole } from "../../hooks/useProjectRole";
 
 interface Props {
   users: User[];
@@ -14,6 +16,36 @@ interface Props {
 const ProjectUsersTable: React.FC<Props> = ({ users, refreshUserTable }) => {
   const { projectId } = useParams();
   const { user: loggedInUser } = useContext(UserContext);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [newRole, setNewRole] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { role, loading } = useProjectRole(projectId);
+
+  const openEditModal = (user: User) => {
+    setSelectedUser(user);
+    setNewRole(user.role || "User"); // default to current role or "User"
+    setIsModalOpen(true);
+  };
+
+  const handleRoleUpdate = async () => {
+    if (!projectId || !selectedUser) return;
+
+    try {
+      await axios.put(
+        `${API_BASE_URL}/projectusers/${projectId}/update-role/${selectedUser.id}`,
+        JSON.stringify(newRole),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      toast.success("Role updated successfully!");
+      setIsModalOpen(false);
+      refreshUserTable();
+    } catch (error) {
+      console.error("Failed to update role:", error);
+      toast.error("Error updating role.");
+    }
+  };
 
   const handleRemove = async (userId: number) => {
     if (!projectId) return;
@@ -36,6 +68,14 @@ const ProjectUsersTable: React.FC<Props> = ({ users, refreshUserTable }) => {
 
   return (
     <div className="mt-8">
+      <ToastContainer
+        position="top-center"
+        autoClose={1500}
+        hideProgressBar={false}
+        pauseOnHover={false}
+        theme="light"
+        transition={Slide}
+      />
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
         Project Users
       </h2>
@@ -70,21 +110,40 @@ const ProjectUsersTable: React.FC<Props> = ({ users, refreshUserTable }) => {
                   )}
                 </td>
 
-                <td className="px-3 py-2 text-center">
-                  {loggedInUser?.id !== user.id && (
-                    <button
-                      onClick={() => handleRemove(user.id)}
-                      className="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      <i className="bi bi-person-x-fill"></i>
-                    </button>
-                  )}
+                <td className="px-1 py-2 text-center">
+                  {loggedInUser?.id !== user.id &&
+                    !loading &&
+                    role === "admin" && (
+                      <>
+                        <button
+                          onClick={() => openEditModal(user)}
+                          className="px-2 py-1 mx-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                        >
+                          <i className="bi bi-pencil-fill"></i>
+                        </button>
+                        <button
+                          onClick={() => handleRemove(user.id)}
+                          className="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                          <i className="bi bi-person-x-fill"></i>
+                        </button>
+                      </>
+                    )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {isModalOpen && selectedUser && (
+        <EditUserRoleModal
+          user={selectedUser}
+          newRole={newRole}
+          setNewRole={setNewRole}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleRoleUpdate}
+        />
+      )}
     </div>
   );
 };
