@@ -7,5 +7,6 @@
         public string Description { get; set; }
         public DateOnly CreatedAt { get; set; }
         public ICollection<ProjectUser> ProjectUsers { get; set; }
+        public ICollection<Column>? Columns { get; set; }    
     }
 }

@@ -50,7 +50,15 @@ namespace API.Controllers
                         pu.User.Email,
                         pu.Role // User's role in the project
                     })
-                    .ToList()
+                    .ToList(),
+                Columns = _context.Columns
+                .Where(c => c.ProjectId == p.Id)
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Name
+                })
+                .ToList()
             })
             .ToListAsync();
 
@@ -111,7 +119,15 @@ namespace API.Controllers
                             pu.User.Email,
                             pu.Role // User's role in the project
                         })
-                        .ToList()
+                        .ToList(),
+                    Columns = _context.Columns
+                    .Where(c => c.ProjectId == p.Id)
+                    .Select(c => new
+                    {
+                        c.Id,
+                        c.Name
+                    })
+                    .ToList()
                 })
                 .FirstOrDefaultAsync();
 

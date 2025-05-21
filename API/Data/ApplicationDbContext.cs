@@ -12,6 +12,7 @@ namespace API.Data
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectUser> ProjectUsers { get; set; }
         public DbSet<ProjectInvitation> ProjectInvitations { get; set; }
+        public DbSet<Column> Columns { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,7 +37,13 @@ namespace API.Data
                 .HasOne(pu => pu.User)
                 .WithMany(u => u.ProjectUsers)
                 .HasForeignKey(pu => pu.UserId);
-        }
+
+            modelBuilder.Entity<Column>()
+            .HasOne(c => c.Project)
+            .WithMany(p => p.Columns)
+            .HasForeignKey(c => c.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+            }
 
 
     }
