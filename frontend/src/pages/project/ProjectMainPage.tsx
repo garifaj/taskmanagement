@@ -6,6 +6,7 @@ import axios from "axios";
 import API_BASE_URL from "../../utils/config";
 import { Project } from "../../context/types";
 import ProjectUsersTable from "./ProjectUsersTable";
+import Column from "./Column";
 
 const ProjectMainPage = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -92,6 +93,12 @@ const ProjectMainPage = () => {
           users={project.users}
           refreshUserTable={fetchProject}
         />
+      )}
+      {activeTab === "board" && (
+        <div className="mt-4">
+          <h2 className="text-lg font-semibold text-gray-800">Project Board</h2>
+          <Column projectId={projectId}  />
+        </div>
       )}
     </>
   );

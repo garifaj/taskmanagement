@@ -19,6 +19,12 @@ export type Project = {
   users: User[];
 };
 
+export type Column = {
+  id: number;
+  name: string;
+  projectId: number;
+};
+
 export type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
