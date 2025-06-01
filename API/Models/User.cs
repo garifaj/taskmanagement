@@ -18,5 +18,8 @@ namespace API.Models
         public string? VerificationToken { get; set; }
         public DateTime? VerificationTokenExpiry { get; set; }
         public ICollection<ProjectUser> ProjectUsers { get; set; }
+        public ICollection<TaskAssignee> TaskAssignees { get; set; } = new List<TaskAssignee>();
+        public ICollection<Task> OwnedTasks { get; set; } = new List<Task>();
+
     }
 }

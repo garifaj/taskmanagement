@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import InviteUserModal from "./InviteUserModal";
+import InviteUserModal from "../../components/project/InviteUserModal";
 import { useProjectRole } from "../../hooks/useProjectRole";
 import axios from "axios";
 import API_BASE_URL from "../../utils/config";
 import { Project } from "../../context/types";
-import ProjectUsersTable from "./ProjectUsersTable";
-import Column from "./Column";
+
+import Column from "../../components/column/Column";
+import ProjectUsersTable from "../../components/project/ProjectUsersTable";
 
 const ProjectMainPage = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -97,7 +98,7 @@ const ProjectMainPage = () => {
       {activeTab === "board" && (
         <div className="mt-4">
           <h2 className="text-lg font-semibold text-gray-800">Project Board</h2>
-          <Column projectId={projectId}  />
+          <Column projectId={projectId} />
         </div>
       )}
     </>

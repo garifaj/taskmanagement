@@ -7,21 +7,21 @@ const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Product Manager at Tech Co",
-    image: "http://localhost:5070/Photos/woman.png",
+    image: "http://localhost:5070/Uploads/woman.png",
     feedback:
       "TaskFlow has revolutionized how our team manages projects. The interface is intuitive, and the collaboration features are game-changing.",
   },
   {
     name: "Michael Chen",
     role: "Team Lead at Innovation Inc",
-    image: "http://localhost:5070/Photos/man.png",
+    image: "http://localhost:5070/Uploads/man.png",
     feedback:
       "The progress tracking features have helped us stay on top of deadlines and deliver projects more efficiently than ever before.",
   },
   {
     name: "Emily Rodriguez",
     role: "Startup Founder",
-    image: "http://localhost:5070/Photos/woman.png",
+    image: "http://localhost:5070/Uploads/woman.png",
     feedback:
       "As a startup founder, TaskFlow has been essential in keeping our small team organized and focused on what matters most.",
   },

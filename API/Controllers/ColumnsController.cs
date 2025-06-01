@@ -28,6 +28,8 @@ namespace API.Controllers
         {
             var columns = await _context.Columns
                 .Where(c => c.ProjectId == projectId)
+                .Include(t => t.Tasks)
+                .Include(p => p.Project)
                 .ToListAsync();
 
             return Ok(columns);
@@ -38,6 +40,8 @@ namespace API.Controllers
         public async Task<IActionResult> GetColumn(int projectId, int columnId)
         {
             var column = await _context.Columns
+                .Include(c => c.Tasks)
+                .Include(c => c.Project)
                 .FirstOrDefaultAsync(c => c.Id == columnId && c.ProjectId == projectId);
 
             if (column == null)
@@ -45,6 +49,7 @@ namespace API.Controllers
 
             return Ok(column);
         }
+
 
         // PUT: Change the name of a specific column
 

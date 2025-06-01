@@ -18,7 +18,7 @@ const Hero = () => {
             </div>
             <div className="relative">
               <img
-                src="http://localhost:5070/Photos/task1.png"
+                src="http://localhost:5070/Uploads/task1.png"
                 alt="TaskFlow Interface"
                 className="w-full h-auto rounded-lg shadow-lg"
               />

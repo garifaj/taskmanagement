@@ -13,6 +13,11 @@ namespace API.Data
         public DbSet<ProjectUser> ProjectUsers { get; set; }
         public DbSet<ProjectInvitation> ProjectInvitations { get; set; }
         public DbSet<Column> Columns { get; set; } 
+        public DbSet<Models.Task> Tasks { get; set; }
+        public DbSet<TaskAssignee> TaskAssignees { get; set; }
+        public DbSet<Attachment> Attachments { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,7 +48,47 @@ namespace API.Data
             .WithMany(p => p.Columns)
             .HasForeignKey(c => c.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
-            }
+
+
+
+            modelBuilder.Entity<TaskAssignee>()
+            .HasKey(ta => ta.Id);  // Id is the primary key
+
+            modelBuilder.Entity<TaskAssignee>()
+                .HasIndex(ta => new { ta.TaskId, ta.UserId }).IsUnique();  // TaskId and UserId are unique together
+            modelBuilder.Entity<TaskAssignee>()
+                .HasOne(ta => ta.Task)
+                .WithMany(t => t.TaskAssignees)
+                .HasForeignKey(ta => ta.TaskId);
+            modelBuilder.Entity<TaskAssignee>()
+                .HasOne(ta => ta.User)
+                .WithMany(u => u.TaskAssignees)
+                .HasForeignKey(ta => ta.UserId);
+
+            // COLUMN → TASK (One-to-Many)
+            modelBuilder.Entity<Column>()
+                .HasMany(c => c.Tasks)
+                .WithOne(t => t.Column)
+                .HasForeignKey(t => t.ColumnId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Attachment>()
+            .HasOne(a => a.Task)
+            .WithMany(t => t.Attachments)
+            .HasForeignKey(a => a.TaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Models.Task>()
+            .HasOne(t => t.Owner)
+            .WithMany(u => u.OwnedTasks)
+            .HasForeignKey(t => t.OwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+
+        }
+
+
 
 
     }

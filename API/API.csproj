@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Photos\" />
+    <Folder Include="Uploads\" />
   </ItemGroup>
 
   <ItemGroup>

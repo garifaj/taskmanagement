@@ -25,6 +25,15 @@ export type Column = {
   projectId: number;
 };
 
+export type Task = {
+  id: number;
+  title: string;
+  description?: string;
+  dueDate?: string; // Change to `Date` if using Date objects
+  priority: "Low" | "Medium" | "High";
+  columnId: number;
+};
+
 export type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;

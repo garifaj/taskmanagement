@@ -5,8 +5,9 @@ import axios from "axios";
 import { Slide, toast, ToastContainer } from "react-toastify";
 import { useContext, useState } from "react";
 import { UserContext } from "../../context/user/UserContext";
-import EditUserRoleModal from "./EditUserRoleModal";
+
 import { useProjectRole } from "../../hooks/useProjectRole";
+import EditUserRoleModal from "./EditUserRoleModal";
 
 interface Props {
   users: User[];
