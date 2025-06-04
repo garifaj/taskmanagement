@@ -12,27 +12,30 @@ import DashboardMainPage from "./pages/dashboard/DashboardMainPage";
 import { ProjectContextProvider } from "./context/project/ProjectContextProvider";
 import ProjectMainPage from "./pages/project/ProjectMainPage";
 import ConfirmInvitePage from "./pages/project/ConfirmInvitePage";
+import { BoardProvider } from "./context/board/BoardContextProvider";
 
 function App() {
   return (
     <UserContextProvider>
       <ProjectContextProvider>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route
-            path="/reset-password/:token"
-            element={<ResetPasswordPage />}
-          />
-          <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
-          <Route path="/confirm-invite" element={<ConfirmInvitePage />} />
-          <Route path="/dashboard/" element={<DashboardLayout />}>
-            <Route path="" element={<DashboardMainPage />} />
-            <Route path="projects/:projectId" element={<ProjectMainPage />} />
-          </Route>
-        </Routes>
+        <BoardProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route
+              path="/reset-password/:token"
+              element={<ResetPasswordPage />}
+            />
+            <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+            <Route path="/confirm-invite" element={<ConfirmInvitePage />} />
+            <Route path="/dashboard/" element={<DashboardLayout />}>
+              <Route path="" element={<DashboardMainPage />} />
+              <Route path="projects/:projectId" element={<ProjectMainPage />} />
+            </Route>
+          </Routes>
+        </BoardProvider>
       </ProjectContextProvider>
     </UserContextProvider>
   );

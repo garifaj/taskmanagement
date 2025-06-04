@@ -1,71 +1,58 @@
 import { useEffect, useState } from "react";
-import { Column, Task } from "../../context/types";
+import { Column as ColumnType, Task } from "../../context/types";
 import ColumnMenu from "./ColumnMenu";
 import CreateTaskButton from "../task/CreateTaskButton";
 import TaskCard from "../task/TaskCard";
-import axios from "axios";
-import API_BASE_URL from "../../utils/config";
+import { useDroppable } from "@dnd-kit/core";
+import { useBoard } from "../../hooks/useBoard";
 
-type ColumnItemProps = {
-  column: Column;
-  isEditing: boolean;
-  editedName: string;
-  activeMenu: number | null;
-  onEditStart: (column: Column) => void;
-  onEditSave: (columnId: number) => void;
-  onEditCancel: () => void;
-  onDelete: (columnId: number) => void;
-  onMenuToggle: (columnId: number) => void;
-  onNameChange: (newName: string) => void;
-};
+const ColumnItem = ({ column }: { column: ColumnType }) => {
+  const { updateColumnName, deleteColumn, setColumns } = useBoard();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(column.name);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
-const ColumnItem = ({
-  column,
-  isEditing,
-  editedName,
-  activeMenu,
-  onEditStart,
-  onEditSave,
-  onEditCancel,
-  onDelete,
-  onMenuToggle,
-  onNameChange,
-}: ColumnItemProps) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const bgColor = isOver ? "bg-blue-100" : "bg-gray-100";
+
+  const handleEditSave = async () => {
+    if (editedName.trim() !== column.name) {
+      await updateColumnName(column.id, editedName);
+    }
+    setIsEditing(false);
+  };
+
+  const handleDelete = async () => {
+    await deleteColumn(column.id);
+  };
+
+  const handleTaskCreated = (newTask: Task) => {
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === column.id ? { ...col, tasks: [...col.tasks, newTask] } : col
+      )
+    );
+  };
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/task/column/${column.id}`);
-        setTasks(res.data);
-      } catch (err) {
-        console.error("Failed to fetch tasks:", err);
-      }
-    };
-
-    fetchTasks();
-  }, [column.id]);
-
-  const addTask = (newTask: Task) => {
-    setTasks((prev) => [...prev, newTask]);
-  };
-
-  const handleDeleteTask = (taskId: number) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
-  };
+    setEditedName(column.name);
+  }, [column.name]);
 
   return (
-    <div className="bg-gray-100 rounded-lg p-4 w-1/4 relative">
+    <div
+      ref={setNodeRef}
+      className={`${bgColor} rounded-lg p-4 w-1/4 relative min-h-[200px] `}
+    >
       <div className="flex items-center justify-between mb-2">
         {isEditing ? (
           <input
             value={editedName}
-            onChange={(e) => onNameChange(e.target.value)}
+            onChange={(e) => setEditedName(e.target.value)}
+            onBlur={handleEditSave}
             onKeyDown={(e) => {
-              if (e.key === "Enter") onEditSave(column.id);
-              if (e.key === "Escape") onEditCancel();
+              if (e.key === "Enter") handleEditSave();
+              if (e.key === "Escape") setIsEditing(false);
             }}
-            onBlur={() => onEditSave(column.id)}
             className="text-xs font-semibold uppercase text-gray-700 border-b border-blue-300 focus:outline-none"
             autoFocus
           />
@@ -76,16 +63,19 @@ const ColumnItem = ({
         )}
         <ColumnMenu
           columnId={column.id}
-          isActive={activeMenu === column.id}
-          onToggle={onMenuToggle}
-          onEdit={() => onEditStart(column)}
-          onDelete={() => onDelete(column.id)}
+          isActive={menuOpen}
+          onToggle={() => setMenuOpen((prev) => !prev)}
+          onEdit={() => setIsEditing(true)}
+          onDelete={handleDelete}
         />
       </div>
-      {tasks.map((task: Task) => (
-        <TaskCard key={task.id} task={task} onTaskDeleted={handleDeleteTask} />
+      {column.tasks?.map((task) => (
+        <TaskCard key={task.id} task={task} />
       ))}
-      <CreateTaskButton columnId={column.id} onTaskCreated={addTask} />
+      <CreateTaskButton
+        columnId={column.id}
+        onTaskCreated={handleTaskCreated}
+      />
     </div>
   );
 };

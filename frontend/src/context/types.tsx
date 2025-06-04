@@ -23,6 +23,7 @@ export type Column = {
   id: number;
   name: string;
   projectId: number;
+  tasks: Task[];
 };
 
 export type Task = {
