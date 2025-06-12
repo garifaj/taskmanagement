@@ -28,8 +28,12 @@ namespace API.Controllers
         {
             var columns = await _context.Columns
                 .Where(c => c.ProjectId == projectId)
-                .Include(t => t.Tasks)
-                .Include(p => p.Project)
+                .Include(c => c.Tasks)
+                    .ThenInclude(t => t.Attachments) // <-- include attachments here
+                .Include(c => c.Tasks)
+                    .ThenInclude(t => t.TaskAssignees)
+                        .ThenInclude(ta => ta.User)
+                .Include(c => c.Project)
                 .ToListAsync();
 
             return Ok(columns);
@@ -41,6 +45,10 @@ namespace API.Controllers
         {
             var column = await _context.Columns
                 .Include(c => c.Tasks)
+                    .ThenInclude(a => a.Attachments) // Include attachments for tasks in the column
+                .Include(c => c.Tasks)
+                    .ThenInclude(t => t.TaskAssignees)
+                        .ThenInclude(ta => ta.User)
                 .Include(c => c.Project)
                 .FirstOrDefaultAsync(c => c.Id == columnId && c.ProjectId == projectId);
 

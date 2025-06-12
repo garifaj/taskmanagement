@@ -30,9 +30,31 @@ export type Task = {
   id: number;
   title: string;
   description?: string;
-  dueDate?: string; // Change to `Date` if using Date objects
+  dueDate?: string;
   priority: "Low" | "Medium" | "High";
   columnId: number;
+  createdAt?: string;
+  owner: User;
+  taskAssignees?: TaskAssignee[];
+  attachments?: Attachment[];
+};
+
+export type TaskAssignee = {
+  id: number;
+  taskId: number;
+  task: Task;
+  userId: number;
+  user: User;
+};
+
+export type Attachment = {
+  id: number;
+  fileName: string;
+  fileType: string;
+  filePath: string;
+  uploadedAt: string;
+  taskId: number;
+  task: Task;
 };
 
 export type UserContextType = {

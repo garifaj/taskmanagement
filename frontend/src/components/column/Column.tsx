@@ -8,7 +8,6 @@ import { useBoard } from "../../hooks/useBoard";
 
 const Column = ({ projectId }: { projectId: string | undefined }) => {
   const { columns, fetchColumns, moveTask, addColumn } = useBoard();
-
   const [showInput, setShowInput] = useState(false);
   const [columnName, setColumnName] = useState("");
 
@@ -32,7 +31,7 @@ const Column = ({ projectId }: { projectId: string | undefined }) => {
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <div className="flex flex-row gap-4 p-4 bg-gray-50 min-h-100">
+      <div className="flex flex-row gap-4 p-4 min-h-100">
         {columns.map((col: Column) => (
           <ColumnItem key={col.id} column={col} />
         ))}

@@ -54,7 +54,6 @@ const ProjectUsersTable: React.FC<Props> = ({ users, refreshUserTable }) => {
       "Are you sure you want to remove this user?"
     );
     if (!confirm) return;
-
     try {
       await axios.delete(
         `${API_BASE_URL}/projectusers/${projectId}/remove-user/${userId}`
@@ -88,7 +87,7 @@ const ProjectUsersTable: React.FC<Props> = ({ users, refreshUserTable }) => {
               <th className="px-3 py-2">Name</th>
               <th className="px-3 py-2">Email</th>
               <th className="px-3 py-2">Role</th>
-              <th className="px-3 py-2">Actions</th>
+              <th className="px-3 py-2 text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -101,16 +100,15 @@ const ProjectUsersTable: React.FC<Props> = ({ users, refreshUserTable }) => {
                 <td className="px-3 py-2">{user.email}</td>
                 <td className="px-3 py-2 capitalize">
                   {user.role?.toLowerCase() === "admin" ? (
-                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/10 ring-inset">
+                    <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/10 ring-inset">
                       {user.role}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-600/10 ring-inset">
+                    <span className="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-600/10 ring-inset">
                       {user.role}
                     </span>
                   )}
                 </td>
-
                 <td className="px-1 py-2 text-center">
                   {loggedInUser?.id !== user.id &&
                     !loading &&

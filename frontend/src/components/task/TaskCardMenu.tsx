@@ -12,11 +12,8 @@ const TaskCardMenu = ({
   isActive,
 }: TaskCardMenuProps) => {
   return (
-    <div className="relative z-10">
+    <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
       <button
-        onPointerDown={(e) => {
-          e.stopPropagation(); // Prevent drag start on pointer down
-        }}
         onClick={onToggle}
         className="p-0 rounded hover:bg-gray-200"
         aria-label="Column menu"
@@ -37,7 +34,7 @@ const TaskCardMenu = ({
         </svg>
       </button>
       {isActive && (
-        <div className="absolute right-0 mt-2 w-40 bg-white rounded shadow z-[999]">
+        <div className="absolute right-0 mt-1 w-40 bg-white rounded shadow z-[999]">
           <button
             onPointerDown={(e) => {
               e.stopPropagation(); // Prevent drag start on pointer down

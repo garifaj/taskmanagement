@@ -44,17 +44,14 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
 
   const updateTaskName = async (taskId: number, newTitle: string) => {
     await axios.put(`${API_BASE_URL}/task/${taskId}`, { title: newTitle });
-    setColumns((prev) => {
-      const updated = structuredClone(prev);
-      for (const col of updated) {
-        const task = col.tasks.find((t) => t.id === taskId);
-        if (task) {
-          task.title = newTitle;
-          break;
-        }
-      }
-      return updated;
-    });
+    setColumns((prev) =>
+      prev.map((col) => ({
+        ...col,
+        tasks: col.tasks.map((task) =>
+          task.id === taskId ? { ...task, title: newTitle } : task
+        ),
+      }))
+    );
   };
 
   const deleteTask = async (taskId: number) => {

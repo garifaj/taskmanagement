@@ -74,12 +74,14 @@ namespace API.Controllers
             _context.Attachments.Add(attachment);
             await _context.SaveChangesAsync();
 
-            return Ok(new
+            return Ok(new Attachment
             {
-                attachment.Id,
-                attachment.FileName,
-                attachment.FileType,
-                Url = $"/Uploads/{uniqueFileName}"
+                Id = attachment.Id,
+                FileName = attachment.FileName,
+                FileType = attachment.FileType,
+                FilePath = Path.Combine("Uploads", uniqueFileName),
+                TaskId = attachment.TaskId,
+                UploadedAt = attachment.UploadedAt
             });
         }
 
@@ -97,6 +99,31 @@ namespace API.Controllers
             var fileBytes = await System.IO.File.ReadAllBytesAsync(fullPath);
             return File(fileBytes, attachment.FileType, attachment.FileName);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAttachment(int id)
+        {
+            var attachment = await _context.Attachments.FindAsync(id);
+            if (attachment == null) return NotFound();
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), attachment.FilePath);
+            if (System.IO.File.Exists(fullPath))
+            {
+                try
+                {
+                    System.IO.File.Delete(fullPath);
+                }
+                catch (Exception ex)
+                {
+                    // Optionally log the exception
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error deleting file.");
+                }
+            }
+            _context.Attachments.Remove(attachment);
+            await _context.SaveChangesAsync();
+
+            return NoContent(); // 204 No Content for successful deletion
+        }
+
 
     }
 }
