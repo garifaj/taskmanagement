@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Models;
 using API.DTOs;
+using Microsoft.Build.Framework;
 
 namespace API.Controllers
 {
@@ -33,6 +34,8 @@ namespace API.Controllers
                 .Include(c => c.Tasks)
                     .ThenInclude(t => t.TaskAssignees)
                         .ThenInclude(ta => ta.User)
+                .Include(c => c.Tasks)
+                    .ThenInclude(t => t.Owner)    // <-- Add this line to include the owner
                 .Include(c => c.Project)
                 .ToListAsync();
 
@@ -44,13 +47,15 @@ namespace API.Controllers
         public async Task<IActionResult> GetColumn(int projectId, int columnId)
         {
             var column = await _context.Columns
-                .Include(c => c.Tasks)
-                    .ThenInclude(a => a.Attachments) // Include attachments for tasks in the column
-                .Include(c => c.Tasks)
-                    .ThenInclude(t => t.TaskAssignees)
-                        .ThenInclude(ta => ta.User)
-                .Include(c => c.Project)
-                .FirstOrDefaultAsync(c => c.Id == columnId && c.ProjectId == projectId);
+            .Include(c => c.Tasks)
+                .ThenInclude(t => t.Attachments)
+            .Include(c => c.Tasks)
+                .ThenInclude(t => t.TaskAssignees)
+                    .ThenInclude(ta => ta.User)
+            .Include(c => c.Tasks)
+                .ThenInclude(t => t.Owner)    // <-- Add this line to include the owner
+            .Include(c => c.Project)
+            .FirstOrDefaultAsync(c => c.Id == columnId && c.ProjectId == projectId);
 
             if (column == null)
                 return NotFound("Column not found for this project.");
@@ -90,7 +95,13 @@ namespace API.Controllers
             _context.Columns.Add(column);
             await _context.SaveChangesAsync();
 
-            return Ok(column);
+            return Ok(new
+            {
+                column.Id,
+                column.Name,
+                column.ProjectId,
+                Tasks = new List<object>() // or List<TaskDto>
+            });
         }
 
         // DELETE: api/Columns/5

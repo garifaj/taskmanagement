@@ -34,7 +34,7 @@ export type Task = {
   priority: "Low" | "Medium" | "High";
   columnId: number;
   createdAt?: string;
-  owner: User;
+  owner?: User;
   taskAssignees?: TaskAssignee[];
   attachments?: Attachment[];
 };

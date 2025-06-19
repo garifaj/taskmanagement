@@ -69,7 +69,7 @@ const ColumnItem = ({ column }: { column: ColumnType }) => {
           onDelete={handleDelete}
         />
       </div>
-      {column.tasks?.map((task) => (
+      {(column.tasks || []).map((task) => (
         <TaskCard key={task.id} task={task} />
       ))}
       <CreateTaskButton

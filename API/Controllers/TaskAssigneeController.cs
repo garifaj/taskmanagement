@@ -17,9 +17,9 @@ namespace API.Controllers
             _context = context;
         }
 
-        // ✅ Assign multiple users to a task
-        [HttpPost("assign-multiple")]
-        public async Task<IActionResult> AssignMultipleUsersToTask([FromBody] AssignUsersDto dto)
+        // ✅ Assign a user to a task
+        [HttpPost("update-assignees")]
+        public async Task<IActionResult> UpdateTaskAssignees([FromBody] UpdateAssigneesDto dto)
         {
             var task = await _context.Tasks
                 .Include(t => t.Column)
@@ -30,59 +30,35 @@ namespace API.Controllers
 
             var projectId = task.Column?.ProjectId;
             if (projectId == null)
-                return NotFound("Task is not associated with a column or project");
+                return NotFound("Invalid task-project relation");
 
             var validUserIds = await _context.ProjectUsers
-                .Where(pu => pu.ProjectId == projectId && dto.UserIds.Contains(pu.UserId))
+                .Where(pu => pu.ProjectId == projectId)
                 .Select(pu => pu.UserId)
                 .ToListAsync();
 
-            if (!validUserIds.Any())
-                return BadRequest("None of the provided users are part of the project");
-
-            var alreadyAssignedIds = await _context.TaskAssignees
-                .Where(ta => ta.TaskId == dto.TaskId && validUserIds.Contains(ta.UserId))
-                .Select(ta => ta.UserId)
+            var currentAssignees = await _context.TaskAssignees
+                .Where(ta => ta.TaskId == dto.TaskId)
                 .ToListAsync();
 
-            var newAssignees = validUserIds
-                .Except(alreadyAssignedIds)
-                .Select(userId => new TaskAssignee
-                {
-                    TaskId = dto.TaskId,
-                    UserId = userId
-                })
+            var toAssign = dto.UserIds.Except(currentAssignees.Select(a => a.UserId));
+            var toUnassign = currentAssignees
+                .Where(a => !dto.UserIds.Contains(a.UserId))
                 .ToList();
 
-            if (!newAssignees.Any())
-                return BadRequest("All users are already assigned to this task");
+            var newAssignees = toAssign.Select(uid => new TaskAssignee { TaskId = dto.TaskId, UserId = uid });
 
             await _context.TaskAssignees.AddRangeAsync(newAssignees);
+            _context.TaskAssignees.RemoveRange(toUnassign);
+
             await _context.SaveChangesAsync();
 
             return Ok(new
             {
-                message = "Users assigned successfully",
-                assignedUserIds = newAssignees.Select(na => na.UserId)
+                message = "Assignees updated",
+                assigned = toAssign,
+                unassigned = toUnassign.Select(u => u.UserId)
             });
-        }
-
-
-
-        // ❌ Remove a user from a task
-        [HttpDelete("unassign")]
-        public async Task<IActionResult> RemoveUserFromTask([FromQuery] int taskId, [FromQuery] int userId)
-        {
-            var assignee = await _context.TaskAssignees
-                .FirstOrDefaultAsync(ta => ta.TaskId == taskId && ta.UserId == userId);
-
-            if (assignee == null)
-                return NotFound("Assignment not found");
-
-            _context.TaskAssignees.Remove(assignee);
-            await _context.SaveChangesAsync();
-
-            return Ok("User removed from task");
         }
 
         // 👥 Get all assignees for a task
