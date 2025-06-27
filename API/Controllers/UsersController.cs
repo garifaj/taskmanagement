@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Models;
-using API.DTOs;
 using System.Security.Cryptography;
 using NuGet.Protocol.Core.Types;
 using API.Helpers;
+using API.DTOs.user;
 
 namespace API.Controllers
 {

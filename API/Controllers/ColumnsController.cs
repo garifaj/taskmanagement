@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Models;
-using API.DTOs;
 using Microsoft.Build.Framework;
+using API.DTOs.column;
 
 namespace API.Controllers
 {
@@ -36,6 +36,8 @@ namespace API.Controllers
                         .ThenInclude(ta => ta.User)
                 .Include(c => c.Tasks)
                     .ThenInclude(t => t.Owner)    // <-- Add this line to include the owner
+                .Include(c => c.Tasks)
+                    .ThenInclude(t => t.Subtasks) 
                 .Include(c => c.Project)
                 .ToListAsync();
 
@@ -54,6 +56,8 @@ namespace API.Controllers
                     .ThenInclude(ta => ta.User)
             .Include(c => c.Tasks)
                 .ThenInclude(t => t.Owner)    // <-- Add this line to include the owner
+            .Include(c => c.Tasks)
+                .ThenInclude(t => t.Subtasks) 
             .Include(c => c.Project)
             .FirstOrDefaultAsync(c => c.Id == columnId && c.ProjectId == projectId);
 

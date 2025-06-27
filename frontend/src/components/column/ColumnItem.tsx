@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Column as ColumnType, Task } from "../../context/types";
 import ColumnMenu from "./ColumnMenu";
 import CreateTaskButton from "../task/CreateTaskButton";
 import TaskCard from "../task/TaskCard";
 import { useDroppable } from "@dnd-kit/core";
 import { useBoard } from "../../hooks/useBoard";
+import { UserContext } from "../../context/user/UserContext";
 
 const ColumnItem = ({ column }: { column: ColumnType }) => {
   const { updateColumnName, deleteColumn, setColumns } = useBoard();
@@ -12,6 +13,7 @@ const ColumnItem = ({ column }: { column: ColumnType }) => {
   const [editedName, setEditedName] = useState(column.name);
   const [menuOpen, setMenuOpen] = useState(false);
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
+  const { user } = useContext(UserContext);
 
   const bgColor = isOver ? "bg-blue-100" : "bg-gray-100";
 
@@ -69,9 +71,17 @@ const ColumnItem = ({ column }: { column: ColumnType }) => {
           onDelete={handleDelete}
         />
       </div>
-      {(column.tasks || []).map((task) => (
-        <TaskCard key={task.id} task={task} />
-      ))}
+      {(column.tasks || [])
+        .filter(
+          (task) =>
+            task.ownerId === user?.id ||
+            (task.taskAssignees || []).some(
+              (assignee) => assignee.userId === user?.id
+            )
+        )
+        .map((task) => (
+          <TaskCard key={task.id} task={task} />
+        ))}
       <CreateTaskButton
         columnId={column.id}
         onTaskCreated={handleTaskCreated}

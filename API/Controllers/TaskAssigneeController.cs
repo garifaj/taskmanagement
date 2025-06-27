@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Models;
-using API.DTOs;
+using API.DTOs.task;
 
 namespace API.Controllers
 {

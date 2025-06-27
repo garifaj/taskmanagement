@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
-using API.DTOs;
 using API.Models;
 using API.Helpers;
+using API.DTOs.task;
 
 namespace API.Controllers
 {

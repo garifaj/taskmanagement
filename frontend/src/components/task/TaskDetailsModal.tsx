@@ -1,9 +1,12 @@
-import { useEffect, useState, useMemo } from "react";
-import { Attachment, Task, User } from "../../context/types";
+import { useEffect, useState, useMemo, useContext } from "react";
+import { Attachment, Subtask, Task, User } from "../../context/types";
 import AttachmentCard from "./AttachmentCard";
 import axios from "axios";
 import API_BASE_URL from "../../utils/config";
 import { useParams } from "react-router-dom";
+import TaskDetailsPanel from "./TaskDetailsPanel";
+import { UserContext } from "../../context/user/UserContext";
+import SubtaskTable from "./SubtaskTable";
 
 type Props = {
   task: Task;
@@ -19,8 +22,11 @@ const TaskDetailsModal = ({ task, onClose }: Props) => {
   const [assignedUserIds, setAssignedUserIds] = useState<number[]>(
     task.taskAssignees?.map((assignment) => assignment.userId) || []
   );
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState<string>("");
+  const [showInput, setShowInput] = useState<boolean>(false);
+  const [subtasks, setSubtasks] = useState(task.subtasks || []);
+  const { user } = useContext(UserContext);
   const { projectId } = useParams();
-
   // This will re-calculate only when assignedUserIds or users change.
   const displayedAssignees = useMemo(() => {
     return users.filter((user) => assignedUserIds.includes(user.id));
@@ -40,6 +46,53 @@ const TaskDetailsModal = ({ task, onClose }: Props) => {
     } catch (error) {
       console.error("Failed to update assignees:", error);
       setAssignedUserIds(assignedUserIds);
+    }
+  };
+
+  const handleAddSubtask = async () => {
+    if (!newSubtaskTitle.trim()) return;
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/subtasks`, {
+        title: newSubtaskTitle,
+        taskId: task.id,
+      });
+      const createdSubtask = response.data;
+      setSubtasks((prev) => [...prev, createdSubtask]);
+      setNewSubtaskTitle("");
+      setShowInput(false);
+    } catch (error) {
+      console.error("Failed to create subtask:", error);
+    }
+  };
+  const handleRemoveSubtask = async (id: number) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/subtasks/${id}`);
+      setSubtasks((prev) => prev.filter((sub) => sub.id !== id));
+    } catch (error) {
+      console.error("Failed to delete subtask:", error);
+      alert("Something went wrong while deleting the subtask.");
+    }
+  };
+
+  const handleToggleSubtaskStatus = async (subtask: Subtask) => {
+    const updatedSubtask = {
+      ...subtask,
+      isCompleted: !subtask.isCompleted,
+      completedBy: !subtask.isCompleted
+        ? `${user?.name} ${user?.surname}`
+        : null, // replace with logged-in user if available
+      completedAt: !subtask.isCompleted ? new Date().toISOString() : null,
+    };
+
+    try {
+      await axios.put(`${API_BASE_URL}/subtasks/${subtask.id}`, updatedSubtask);
+      setSubtasks((prev) =>
+        prev.map((s) => (s.id === subtask.id ? { ...s, ...updatedSubtask } : s))
+      );
+    } catch (error) {
+      console.error("Error updating subtask:", error);
+      alert("Failed to update subtask status.");
     }
   };
 
@@ -89,13 +142,6 @@ const TaskDetailsModal = ({ task, onClose }: Props) => {
     } catch (error) {
       console.error("Delete failed:", error);
     }
-  };
-
-  const renderAssignees = (assignees: User[]) => {
-    if (!assignees || assignees.length === 0) {
-      return <span>No assignees</span>;
-    }
-    return assignees.map((user) => `${user.name} ${user.surname}`).join(", ");
   };
 
   return (
@@ -162,7 +208,7 @@ const TaskDetailsModal = ({ task, onClose }: Props) => {
               <p className="font-semibold mb-2">Description</p>
               <p className="text-gray-700 text-sm">{task.description}</p>
             </div>
-            <div className="mb-2 mt-5">
+            <div className="mb-5 mt-5">
               <p className="font-semibold mb-2">Attachments</p>
               {attachments.length > 0 ? (
                 <div className="inline-flex gap-2 flex-wrap">
@@ -178,74 +224,51 @@ const TaskDetailsModal = ({ task, onClose }: Props) => {
                 <p className="text-sm text-gray-500 italic">No attachments</p>
               )}
             </div>
-          </div>
-          <div className="h-full rounded p-3">
-            <h3 className="text-lg font-semibold mb-3">Details</h3>
-            <div className="flow-root">
-              <dl className="-my-3 divide-y divide-gray-200 text-sm *:even:bg-gray-50">
-                <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                  <dt className="font-medium text-gray-900">Assignee</dt>
-                  <dd className="text-gray-700 sm:col-span-2">
-                    {renderAssignees(displayedAssignees)}
-                  </dd>
+
+            <div className="mb-5">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="font-semibold">Subtasks</p>
+                <button
+                  onClick={() => setShowInput(true)}
+                  className="rounded border border-blue-500 bg-blue-600 px-4 py-2 text-xs font-medium text-white transition hover:bg-transparent hover:text-blue-600 hover:cursor-pointer"
+                >
+                  Add subtask
+                </button>
+              </div>
+              {showInput && (
+                <div className="mb-2 flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Subtask title"
+                    value={newSubtaskTitle}
+                    onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                    className="flex-1 rounded border px-2 py-1 text-sm"
+                  />
+                  <button
+                    onClick={handleAddSubtask}
+                    className="rounded bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowInput(false);
+                      setNewSubtaskTitle("");
+                    }}
+                    className="text-sm text-gray-500 hover:underline"
+                  >
+                    Cancel
+                  </button>
                 </div>
-                <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                  <dt className="font-medium text-gray-900">Created at</dt>
-                  <dd className="text-gray-700 sm:col-span-2">
-                    {task.createdAt
-                      ? new Date(task.createdAt).toLocaleString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : "No creation date"}
-                  </dd>
-                </div>
-                <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                  <dt className="font-medium text-gray-900">Due date</dt>
-                  <dd className="text-gray-700 sm:col-span-2">
-                    {task.dueDate
-                      ? new Date(task.dueDate).toLocaleString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : "No due date"}
-                  </dd>
-                </div>
-                <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                  <dt className="font-medium text-gray-900">Priority</dt>
-                  <dd className="text-gray-700 sm:col-span-2">
-                    {task.priority?.toLowerCase() === "low" && (
-                      <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/10 ring-inset">
-                        Low
-                      </span>
-                    )}
-                    {task.priority?.toLowerCase() === "medium" && (
-                      <span className="inline-flex items-center rounded-md bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-yellow-600/10 ring-inset">
-                        Medium
-                      </span>
-                    )}
-                    {task.priority?.toLowerCase() === "high" && (
-                      <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-red-600/10 ring-inset">
-                        High
-                      </span>
-                    )}
-                  </dd>
-                </div>
-                <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                  <dt className="font-medium text-gray-900">Reporter</dt>
-                  <dd className="text-gray-700 sm:col-span-2">
-                    {task.owner?.name} {task.owner?.surname || "Unknown"}
-                  </dd>
-                </div>
-              </dl>
+              )}
+              <SubtaskTable
+                subtasks={subtasks}
+                handleToggleSubtaskStatus={handleToggleSubtaskStatus}
+                handleRemoveSubtask={handleRemoveSubtask}
+              />
             </div>
           </div>
+          <TaskDetailsPanel task={task} assignees={displayedAssignees} />
         </div>
       </div>
     </div>

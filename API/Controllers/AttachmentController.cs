@@ -4,7 +4,7 @@ using API.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
-using API.DTOs;
+using API.DTOs.attachment;
 
 namespace API.Controllers
 {

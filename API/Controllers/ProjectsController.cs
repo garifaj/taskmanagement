@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Models;
-using API.DTOs;
 using API.Helpers;
 using NuGet.Protocol.Core.Types;
+using API.DTOs.project;
 
 namespace API.Controllers
 {

@@ -1,5 +1,5 @@
 ﻿using API.Data;
-using API.DTOs;
+using API.DTOs.user;
 using API.Helpers;
 using API.Models;
 using BCrypt.Net;

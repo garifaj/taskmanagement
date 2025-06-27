@@ -34,9 +34,21 @@ export type Task = {
   priority: "Low" | "Medium" | "High";
   columnId: number;
   createdAt?: string;
+  ownerId?: number;
   owner?: User;
   taskAssignees?: TaskAssignee[];
   attachments?: Attachment[];
+  subtasks?: Subtask[];
+};
+
+export type Subtask = {
+  id: number;
+  taskId: number;
+  task: Task;
+  title: string;
+  isCompleted: boolean;
+  completedBy: string | null;
+  completedAt: string | null;
 };
 
 export type TaskAssignee = {

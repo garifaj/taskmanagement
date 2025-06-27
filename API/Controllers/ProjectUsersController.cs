@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Models;
 using API.Helpers;
-using API.DTOs;
+using API.DTOs.user;
+using API.DTOs.project;
 
 namespace API.Controllers
 {

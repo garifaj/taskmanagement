@@ -1,4 +1,4 @@
-﻿namespace API.DTOs
+﻿namespace API.DTOs.task
 {
     public class UpdateAssigneesDto
     {

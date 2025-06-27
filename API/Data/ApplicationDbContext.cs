@@ -16,6 +16,7 @@ namespace API.Data
         public DbSet<Models.Task> Tasks { get; set; }
         public DbSet<TaskAssignee> TaskAssignees { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
+        public DbSet<Subtask> Subtasks { get; set; } 
 
 
 
@@ -84,6 +85,11 @@ namespace API.Data
             .HasForeignKey(t => t.OwnerId)
             .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Subtask>()
+                .HasOne(s => s.Task)
+                .WithMany(t => t.Subtasks)
+                .HasForeignKey(s => s.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         }

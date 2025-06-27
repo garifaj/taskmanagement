@@ -14,5 +14,6 @@
         public ICollection<TaskAssignee>? TaskAssignees { get; set; } = new List<TaskAssignee>();
         public int ColumnId { get; set; }
         public Column Column { get; set; } // Column name will serve as status
+        public ICollection<Subtask>? Subtasks { get; set; } = new List<Subtask>();
     }
 }
