@@ -13,6 +13,9 @@ import { ProjectContextProvider } from "./context/project/ProjectContextProvider
 import ProjectMainPage from "./pages/project/ProjectMainPage";
 import ConfirmInvitePage from "./pages/project/ConfirmInvitePage";
 import { BoardProvider } from "./context/board/BoardContextProvider";
+import NotFoundPage from "./pages/error/NotFoundPage";
+import UnauthorizedPage from "./pages/error/UnauthorizedPage";
+import ProtectedRoute from "./pages/error/ProtectedRoute";
 
 function App() {
   return (
@@ -20,6 +23,7 @@ function App() {
       <ProjectContextProvider>
         <BoardProvider>
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -30,10 +34,21 @@ function App() {
             />
             <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
             <Route path="/confirm-invite" element={<ConfirmInvitePage />} />
-            <Route path="/dashboard/" element={<DashboardLayout />}>
-              <Route path="" element={<DashboardMainPage />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+            {/* Protected Routes */}
+            <Route
+              path="/dashboard/"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<DashboardMainPage />} />
               <Route path="projects/:projectId" element={<ProjectMainPage />} />
             </Route>
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BoardProvider>
       </ProjectContextProvider>

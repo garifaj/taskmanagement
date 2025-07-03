@@ -13,16 +13,21 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ toggleSidebar }: SidebarProps) => {
-  const { setUser } = useContext(UserContext);
+  const { setUser, setReady } = useContext(UserContext);
   const [isDropdownOpen, setDropdownOpen] = useState(true);
   const [showModal, setShowModal] = useState<boolean>(false);
   const navigate = useNavigate();
   const { userProjects, fetchUserProjects } = useProjectContext();
 
   const handleLogout = async () => {
-    await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
-    navigate("/"); // Redirect to homepage after logging out
-    setUser(null); // Clear user data from context
+    try {
+      await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
+      setUser(null);
+      setReady(false); // Reset ready state
+      navigate("/");
+    } catch (error) {
+      console.error("Logout request error:", error);
+    }
   };
 
   const toggleDropdown = () => {
@@ -38,76 +43,76 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
 
   return (
     <>
-      <div className="sidebar h-screen p-2 overflow-y-auto text-center bg-white shadow-md rounded-md">
-        <div className="text-gray-600 text-xl">
-          <div className="p-2.5 mt-1 flex items-center">
-            <h1 className="font-bold text-[15px] ml-3">TaskFlow</h1>
+      <div className="sidebar h-screen p-4 overflow-y-auto bg-white shadow-lg rounded-lg flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between py-3 px-2 border-b border-gray-100">
+            <h1 className="font-bold text-xl text-blue-600 tracking-wide">
+              TaskFlow
+            </h1>
             <i
-              className="bi bi-x cursor-pointer ml-auto text-gray-500 lg:hidden"
+              className="bi bi-x cursor-pointer text-gray-400 hover:text-gray-600 lg:hidden text-2xl"
               onClick={toggleSidebar}
             ></i>
           </div>
-          <div className="my-2 bg-gray-300 h-[1px]"></div>
-        </div>
 
-        <div
-          className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-500/10 text-gray-500 hover:text-blue-500"
-          onClick={() => navigate("")}
-        >
-          <i className="bi bi-house-door-fill"></i>
-          <span className="text-[15px] ml-4 font-medium">Dashboard</span>
-        </div>
-
-        <div
-          className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-500/10 text-gray-500 hover:text-blue-500"
-          onClick={toggleDropdown}
-        >
-          <i className="bi bi-kanban"></i>
-          <div className="flex justify-between w-full items-center">
-            <span className="text-[15px] ml-4 font-medium">Projects</span>
-            <span
-              className={`text-sm transform transition-transform ${
-                isDropdownOpen ? "rotate-180" : "rotate-0"
-              }`}
-            >
-              <i className="bi bi-chevron-down"></i>
-            </span>
-          </div>
-        </div>
-
-        {isDropdownOpen && (
-          <>
-            <div className="text-left text-sm mt-2 w-4/5 mx-auto text-gray-500  font-medium">
-              {userProjects.map((project: Project) => (
-                <h1
-                  key={project.id}
-                  onClick={() => navigate(`projects/${project.id}`)}
-                  className="cursor-pointer p-2 hover:bg-blue-500/10 rounded-md mt-1 hover:text-blue-500"
-                >
-                  {project.title}
-                </h1>
-              ))}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowModal(true)}
-              className="mt-2 flex items-center rounded py-1.5 px-4 text-sm font-medium text-left text-blue-600 transition-colors duration-300 hover:text-blue-400 focus:outline-none cursor-pointer"
-            >
-              <PlusIcon />
-              <span className="mx-2">Add new project</span>
-            </button>
-          </>
-        )}
-
-        <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-200 text-red-500">
-          <i className="bi bi-box-arrow-in-right"></i>
-          <button
-            onClick={handleLogout}
-            className="text-[15px] ml-4 font-medium cursor-pointer"
+          <div
+            className="p-3 mt-4 flex items-center rounded-lg px-4 duration-200 cursor-pointer text-gray-600 hover:bg-blue-50 hover:text-blue-700"
+            onClick={() => navigate("")}
           >
-            Sign out
-          </button>
+            <i className="bi bi-house-door-fill text-lg"></i>
+            <span className="text-base ml-4 font-medium">Dashboard</span>
+          </div>
+
+          <div
+            className="p-3 mt-2 flex items-center rounded-lg px-4 duration-200 cursor-pointer text-gray-600 hover:bg-blue-50 hover:text-blue-700"
+            onClick={toggleDropdown}
+          >
+            <i className="bi bi-kanban text-lg"></i>
+            <div className="flex justify-between w-full items-center">
+              <span className="text-base ml-4 font-medium">Projects</span>
+              <span
+                className={`text-sm transform transition-transform ${
+                  isDropdownOpen ? "rotate-180" : "rotate-0"
+                }`}
+              >
+                <i className="bi bi-chevron-down"></i>
+              </span>
+            </div>
+          </div>
+          {isDropdownOpen && (
+            <>
+              <div className="text-left text-sm mt-2 pl-12 pr-4 text-gray-600 font-normal">
+                {userProjects.map((project: Project) => (
+                  <h1
+                    key={project.id}
+                    onClick={() => navigate(`projects/${project.id}`)}
+                    className="cursor-pointer py-2 hover:bg-blue-50 rounded-md my-1 hover:text-blue-700 transition-colors duration-200"
+                  >
+                    {project.title}
+                  </h1>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowModal(true)}
+                className="mt-3 ml-10 flex items-center rounded-full py-2 px-4 text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-100 transition-colors duration-300 hover:bg-blue-100 hover:border-blue-200 focus:outline-none cursor-pointer"
+              >
+                <PlusIcon />
+                <span>Add new project</span>
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="border-t border-gray-100 pt-4 pb-2 px-2">
+          <div
+            className="p-3 flex items-center rounded-lg px-4 duration-300 cursor-pointer text-red-500 hover:bg-red-50 hover:text-red-600"
+            onClick={handleLogout}
+          >
+            <i className="bi bi-box-arrow-in-right text-lg"></i>
+            <span className="text-base ml-4 font-medium">Sign out</span>
+          </div>
         </div>
       </div>
       <NewProjectModal

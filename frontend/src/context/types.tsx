@@ -73,6 +73,7 @@ export type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
   ready: boolean;
+  setReady: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export type UserContextProviderProps = {

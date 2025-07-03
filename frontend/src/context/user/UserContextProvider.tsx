@@ -28,7 +28,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
   }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, ready }}>
+    <UserContext.Provider value={{ user, setUser, ready, setReady }}>
       {children}
     </UserContext.Provider>
   );

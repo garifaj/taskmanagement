@@ -5,4 +5,5 @@ export const UserContext = createContext<UserContextType>({
   user: null,
   setUser: () => {},
   ready: false,
+  setReady: () => {},
 });

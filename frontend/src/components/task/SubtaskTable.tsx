@@ -11,10 +11,26 @@ const SubtaskTable = ({
   handleToggleSubtaskStatus,
   handleRemoveSubtask,
 }: SubtaskTableProps) => {
+  // Calculate completed percentage
+  const completedCount = subtasks.filter((s) => s.isCompleted).length;
+  const totalCount = subtasks.length;
+  const progressPercent =
+    totalCount === 0 ? 0 : (completedCount / totalCount) * 100;
+
   return (
     <div>
       {subtasks && subtasks.length > 0 && (
         <div className="space-y-2">
+          <p className="text-xs text-center text-gray-600">{`${Math.round(
+            progressPercent
+          )}% of subtasks completed`}</p>
+          <div className="w-full bg-gray-300 rounded h-3 overflow-hidden mb-2">
+            <div
+              className="bg-green-500 h-3 transition-all duration-300"
+              style={{ width: `${progressPercent}%` }}
+              aria-label={`Progress: ${Math.round(progressPercent)}% completed`}
+            ></div>
+          </div>
           <div className="overflow-x-auto rounded border border-gray-300 shadow-sm">
             <table className="min-w-full divide-y-2 divide-gray-200">
               <thead className="ltr:text-left rtl:text-right">
@@ -22,7 +38,9 @@ const SubtaskTable = ({
                   <th className="px-3 py-2 whitespace-nowrap">Title</th>
                   <th className="px-3 py-2 whitespace-nowrap">Status</th>
                   <th className="px-3 py-2 whitespace-nowrap">Author</th>
-                  <th className="px-3 py-2 whitespace-nowrap">Actions</th>
+                  <th className="px-3 py-2 whitespace-nowrap text-center">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -32,12 +50,20 @@ const SubtaskTable = ({
                       {subtask.title}
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap">
-                      {subtask.isCompleted ? "Done" : "In Progress"}
+                      {subtask.isCompleted ? (
+                        <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/10 ring-inset">
+                          Done
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-md bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-red-600/10 ring-inset">
+                          In progress
+                        </span>
+                      )}
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       {subtask.completedBy || ""}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
+                    <td className="px-3 py-2 whitespace-nowrap flex items-center justify-center space-x-2">
                       <div className="flex items-center space-x-2">
                         <label
                           htmlFor={`subtask-${subtask.id}`}
