@@ -17,6 +17,7 @@ export type Project = {
   description: string;
   createdAt: string; // Change to `Date` if using Date objects
   users: User[];
+  columns: Column[];
 };
 
 export type Column = {

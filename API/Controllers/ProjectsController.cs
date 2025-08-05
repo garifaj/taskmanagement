@@ -98,7 +98,7 @@ namespace API.Controllers
 
         // GET: api/Projects/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Project>> GetProject(int id)
+        public async Task<ActionResult<object>> GetProject(int id)
         {
             var project = await _context.Projects
                 .Where(p => p.Id == id)
@@ -108,8 +108,9 @@ namespace API.Controllers
                     p.Title,
                     p.Description,
                     p.CreatedAt,
+
                     Users = _context.ProjectUsers
-                    .Where(pu => pu.ProjectId == p.Id)
+                        .Where(pu => pu.ProjectId == p.Id)
                         .Include(pu => pu.User)
                         .Select(pu => new
                         {
@@ -117,17 +118,30 @@ namespace API.Controllers
                             pu.User.Name,
                             pu.User.Surname,
                             pu.User.Email,
-                            pu.Role // User's role in the project
+                            pu.Role
                         })
                         .ToList(),
+
                     Columns = _context.Columns
-                    .Where(c => c.ProjectId == p.Id)
-                    .Select(c => new
-                    {
-                        c.Id,
-                        c.Name
-                    })
-                    .ToList()
+                        .Where(c => c.ProjectId == p.Id)
+                        .Select(c => new
+                        {
+                            c.Id,
+                            c.Name,
+                            Tasks = _context.Tasks
+                                .Where(t => t.ColumnId == c.Id)
+                                .Select(t => new
+                                {
+                                    t.Id,
+                                    t.Title,
+                                    t.Description,
+                                    t.DueDate,
+                                    t.CreatedAt,
+                                    t.Priority
+                                })
+                                .ToList()
+                        })
+                        .ToList()
                 })
                 .FirstOrDefaultAsync();
 
@@ -136,8 +150,9 @@ namespace API.Controllers
                 return NotFound();
             }
 
-                return Ok(project);
+            return Ok(project);
         }
+
 
         // PUT: api/Projects/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

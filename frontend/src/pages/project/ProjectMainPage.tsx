@@ -8,11 +8,14 @@ import { Project } from "../../context/types";
 
 import Column from "../../components/column/Column";
 import ProjectUsersTable from "../../components/project/ProjectUsersTable";
+import ProjectAdminDashboard from "../../components/project/ProjectAdminDashboard";
 
 const ProjectMainPage = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [project, setProject] = useState<Project | null>(null);
-  const [activeTab, setActiveTab] = useState<"board" | "users">("board");
+  const [activeTab, setActiveTab] = useState<"board" | "users" | "dashboard">(
+    "board"
+  );
 
   const { projectId } = useParams();
   const { role, loading } = useProjectRole(projectId);
@@ -30,11 +33,21 @@ const ProjectMainPage = () => {
     if (projectId) fetchProject();
   }, [projectId, fetchProject]);
 
+  useEffect(() => {
+    if (!loading) {
+      if (role === "admin") {
+        setActiveTab("dashboard");
+      } else {
+        setActiveTab("board");
+      }
+    }
+  }, [loading, role]);
+
   return (
     <>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">
+          <h1 className="text-xl font-bold text-gray-700">
             {project ? project.title : "Project Dashboard"}
           </h1>
           <p className="text-gray-500 mt-1">
@@ -60,6 +73,19 @@ const ProjectMainPage = () => {
 
       <div className="mt-4 border-b border-gray-200 ">
         <div className="flex space-x-4 pt-2">
+          {!loading && role === "admin" && (
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`pb-2 text-sm font-medium border-b-2 hover:cursor-pointer ${
+                activeTab === "dashboard"
+                  ? "text-blue-600 border-blue-600"
+                  : "text-gray-600 border-transparent hover:text-blue-600"
+              }`}
+            >
+              Dashboard
+            </button>
+          )}
+
           <button
             onClick={() => setActiveTab("board")}
             className={`pb-2 text-sm font-medium border-b-2 hover:cursor-pointer ${
@@ -99,6 +125,11 @@ const ProjectMainPage = () => {
         <div className="mt-4">
           <h2 className="text-lg font-semibold text-gray-800">Project Board</h2>
           <Column projectId={projectId} />
+        </div>
+      )}
+      {activeTab === "dashboard" && role === "admin" && (
+        <div className="mt-4">
+          <ProjectAdminDashboard project={project} />
         </div>
       )}
     </>
