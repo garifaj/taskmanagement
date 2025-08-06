@@ -123,7 +123,6 @@ const ProjectMainPage = () => {
       )}
       {activeTab === "board" && (
         <div className="mt-4">
-          <h2 className="text-lg font-semibold text-gray-800">Project Board</h2>
           <Column projectId={projectId} />
         </div>
       )}

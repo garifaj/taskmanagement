@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import TaskDetailsPanel from "./TaskDetailsPanel";
 import { UserContext } from "../../context/user/UserContext";
 import SubtaskTable from "./SubtaskTable";
+import { useProjectRole } from "../../hooks/useProjectRole";
 
 type Props = {
   task: Task;
@@ -27,6 +28,7 @@ const TaskDetailsModal = ({ task, onClose }: Props) => {
   const [subtasks, setSubtasks] = useState(task.subtasks || []);
   const { user } = useContext(UserContext);
   const { projectId } = useParams();
+  const { role } = useProjectRole(projectId);
   // This will re-calculate only when assignedUserIds or users change.
   const displayedAssignees = useMemo(() => {
     return users.filter((user) => assignedUserIds.includes(user.id));
@@ -171,38 +173,40 @@ const TaskDetailsModal = ({ task, onClose }: Props) => {
                   className="sr-only"
                 />
               </label>
-              <div className="relative inline-block text-left">
-                <button
-                  type="button"
-                  onClick={toggleDropdown}
-                  className="px-3 py-3 text-xs text-gray-600 border border-gray-300 shadow-sm rounded-md hover:bg-gray-50"
-                >
-                  Assign user
-                </button>
-                {assignDropdownOpen && (
-                  <div className="absolute z-10 mt-2 w-40 rounded-md border border-gray-200 bg-white shadow-lg p-4">
-                    <div className="flex flex-col items-start gap-3">
-                      {users.map((user) => (
-                        <label
-                          key={user.id}
-                          className="inline-flex items-center gap-3"
-                        >
-                          <input
-                            type="checkbox"
-                            id={`user-${user.id}`}
-                            className="size-4 rounded border-gray-300 shadow-sm"
-                            checked={assignedUserIds.includes(user.id)}
-                            onChange={() => handleToggleUser(user.id)}
-                          />
-                          <span className="text-sm text-gray-600">
-                            {user.name} {user.surname}
-                          </span>
-                        </label>
-                      ))}
+              {role === "admin" && (
+                <div className="relative inline-block text-left">
+                  <button
+                    type="button"
+                    onClick={toggleDropdown}
+                    className="px-3 py-3 text-xs text-gray-600 border border-gray-300 shadow-sm rounded-md hover:bg-gray-50"
+                  >
+                    Assign user
+                  </button>
+                  {assignDropdownOpen && (
+                    <div className="absolute z-10 mt-2 w-40 rounded-md border border-gray-200 bg-white shadow-lg p-4">
+                      <div className="flex flex-col items-start gap-3">
+                        {users.map((user) => (
+                          <label
+                            key={user.id}
+                            className="inline-flex items-center gap-3"
+                          >
+                            <input
+                              type="checkbox"
+                              id={`user-${user.id}`}
+                              className="size-4 rounded border-gray-300 shadow-sm"
+                              checked={assignedUserIds.includes(user.id)}
+                              onChange={() => handleToggleUser(user.id)}
+                            />
+                            <span className="text-sm text-gray-600">
+                              {user.name} {user.surname}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className="mb-5">
               <p className="font-semibold mb-2">Description</p>

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Models;
 using API.DTOs.task;
+using API.Helpers;
 
 namespace API.Controllers
 {
@@ -11,10 +12,12 @@ namespace API.Controllers
     public class TaskAssigneeController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly EmailService _emailService;
 
-        public TaskAssigneeController(ApplicationDbContext context)
+        public TaskAssigneeController(ApplicationDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // ✅ Assign a user to a task
@@ -46,12 +49,37 @@ namespace API.Controllers
                 .Where(a => !dto.UserIds.Contains(a.UserId))
                 .ToList();
 
-            var newAssignees = toAssign.Select(uid => new TaskAssignee { TaskId = dto.TaskId, UserId = uid });
+            var newAssignees = toAssign.Select(uid => new TaskAssignee
+            {
+                TaskId = dto.TaskId,
+                UserId = uid
+            });
 
             await _context.TaskAssignees.AddRangeAsync(newAssignees);
             _context.TaskAssignees.RemoveRange(toUnassign);
 
             await _context.SaveChangesAsync();
+
+            // ✅ Send email to newly assigned users
+            var projectName = await _context.Projects
+                .Where(p => p.Id == projectId)
+                .Select(p => p.Title)
+                .FirstOrDefaultAsync();
+
+            foreach (var userId in toAssign)
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    await _emailService.SendTaskAssignedEmailAsync(
+                        user.Email,
+                        task?.Title ?? "Unknown title",
+                        projectName ?? "Unknown Project",
+                        task?.DueDate,
+                        projectId.Value
+                    );
+                }
+            }
 
             return Ok(new
             {
@@ -60,6 +88,7 @@ namespace API.Controllers
                 unassigned = toUnassign.Select(u => u.UserId)
             });
         }
+
 
         // 👥 Get all assignees for a task
         [HttpGet("task/{taskId}")]

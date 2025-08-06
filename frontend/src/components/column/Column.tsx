@@ -5,11 +5,13 @@ import AddColumnForm from "./AddColumnForm";
 
 import type { Column } from "../../context/types";
 import { useBoard } from "../../hooks/useBoard";
+import { useProjectRole } from "../../hooks/useProjectRole";
 
 const Column = ({ projectId }: { projectId: string | undefined }) => {
   const { columns, fetchColumns, moveTask, addColumn } = useBoard();
   const [showInput, setShowInput] = useState(false);
   const [columnName, setColumnName] = useState("");
+  const { role } = useProjectRole(projectId);
 
   useEffect(() => {
     if (projectId) fetchColumns(projectId);
@@ -35,17 +37,19 @@ const Column = ({ projectId }: { projectId: string | undefined }) => {
         {columns.map((col: Column) => (
           <ColumnItem key={col.id} column={col} />
         ))}
-        <AddColumnForm
-          showInput={showInput}
-          columnName={columnName}
-          onAdd={handleAddColumn}
-          onCancel={() => {
-            setShowInput(false);
-            setColumnName("");
-          }}
-          onNameChange={setColumnName}
-          onShowForm={() => setShowInput(true)}
-        />
+        {role === "admin" && (
+          <AddColumnForm
+            showInput={showInput}
+            columnName={columnName}
+            onAdd={handleAddColumn}
+            onCancel={() => {
+              setShowInput(false);
+              setColumnName("");
+            }}
+            onNameChange={setColumnName}
+            onShowForm={() => setShowInput(true)}
+          />
+        )}
       </div>
     </DndContext>
   );

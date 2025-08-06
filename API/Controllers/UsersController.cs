@@ -156,17 +156,18 @@ namespace API.Controllers
                 Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 isSuperAdmin = dto.isSuperAdmin,
                 IsEmailVerified = false,
-                VerificationToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)), // Generate verification token
-                VerificationTokenExpiry = DateTime.UtcNow.AddHours(24) // Set expiry date
+                VerificationToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                VerificationTokenExpiry = DateTime.UtcNow.AddHours(24)
             };
 
             _repository.Create(user);
 
-            //Send verification email
-            _emailService.SendVerificationEmail(user.Email, user.VerificationToken);
+            // ✅ Send email asynchronously
+            await _emailService.SendVerificationEmailAsync(user.Email, user.VerificationToken);
 
             return Ok(new { message = "User created successfully." });
         }
+
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]

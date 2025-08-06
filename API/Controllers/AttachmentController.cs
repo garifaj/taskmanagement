@@ -112,7 +112,7 @@ namespace API.Controllers
                 {
                     System.IO.File.Delete(fullPath);
                 }
-                catch (Exception ex)
+                catch 
                 {
                     // Optionally log the exception
                     return StatusCode(StatusCodes.Status500InternalServerError, "Error deleting file.");

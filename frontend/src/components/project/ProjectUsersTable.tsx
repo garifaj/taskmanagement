@@ -76,9 +76,6 @@ const ProjectUsersTable: React.FC<Props> = ({ users, refreshUserTable }) => {
         theme="light"
         transition={Slide}
       />
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        Project Users
-      </h2>
       <div className="overflow-x-auto rounded-lg border border-gray-300">
         <table className="min-w-full divide-y-2 divide-gray-200">
           <thead className="text-left bg-gray-150">

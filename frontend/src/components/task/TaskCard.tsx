@@ -4,6 +4,8 @@ import { useDraggable } from "@dnd-kit/core";
 import TaskCardMenu from "./TaskCardMenu";
 import { useBoard } from "../../hooks/useBoard";
 import TaskDetailsModal from "./TaskDetailsModal";
+import { useParams } from "react-router-dom";
+import { useProjectRole } from "../../hooks/useProjectRole";
 
 type TaskCardProps = {
   task: Task;
@@ -15,6 +17,8 @@ const TaskCard = ({ task }: TaskCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const { deleteTask, updateTaskName } = useBoard();
+  const { projectId } = useParams();
+  const { role } = useProjectRole(projectId);
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task.id,
@@ -88,18 +92,19 @@ const TaskCard = ({ task }: TaskCardProps) => {
             )}
           </div>
         </div>
-
         {/* Menu */}
         <div className="absolute top-2 right-2">
-          <TaskCardMenu
-            isActive={isMenuOpen}
-            onToggle={() => setIsMenuOpen((prev) => !prev)}
-            onEdit={() => {
-              setIsEditing(true);
-              setIsMenuOpen(false);
-            }}
-            onDelete={handleDelete}
-          />
+          {role === "admin" && (
+            <TaskCardMenu
+              isActive={isMenuOpen}
+              onToggle={() => setIsMenuOpen((prev) => !prev)}
+              onEdit={() => {
+                setIsEditing(true);
+                setIsMenuOpen(false);
+              }}
+              onDelete={handleDelete}
+            />
+          )}
         </div>
       </div>
       {/* Modal */}

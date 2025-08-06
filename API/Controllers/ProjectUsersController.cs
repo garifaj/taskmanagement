@@ -43,15 +43,17 @@ namespace API.Controllers
                 ProjectId = request.ProjectId,
                 InviteToken = inviteToken,
                 Role = request.Role,
-                Expiration = DateTime.UtcNow.AddHours(24) // Token expires in 24 hours
+                Expiration = DateTime.UtcNow.AddHours(24)
             };
             _context.ProjectInvitations.Add(invitation);
             await _context.SaveChangesAsync();
 
-            // Send email
-            _emailService.SendProjectInvitationEmail(request.Email, request.ProjectId, inviteToken, request.Role);
+            // ✅ Use async email sending
+            await _emailService.SendProjectInvitationEmailAsync(request.Email, request.ProjectId, inviteToken, request.Role);
+
             return Ok("Invitation sent.");
         }
+
 
         //  Confirm invitation - api/ProjectUsers/confirm-invite
         [HttpPost("confirm-invite")]

@@ -24,7 +24,7 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterDto dto)
+        public async Task<IActionResult> Register(RegisterDto dto)
         {
             var user = new User
             {
@@ -34,16 +34,18 @@ namespace API.Controllers
                 Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 isSuperAdmin = false,
                 IsEmailVerified = false,
-                VerificationToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)), // Generate verification token
-                VerificationTokenExpiry = DateTime.UtcNow.AddHours(24) // Set expiry date
+                VerificationToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                VerificationTokenExpiry = DateTime.UtcNow.AddHours(24)
             };
+
             _repository.Create(user);
 
-            //Send verification email
-            _emailService.SendVerificationEmail(user.Email, user.VerificationToken);
+            // ✅ Send verification email asynchronously
+            await _emailService.SendVerificationEmailAsync(user.Email, user.VerificationToken);
 
             return Ok(new { message = "Registration successful! Please check your email to verify your account." });
         }
+
 
 
         [HttpPost("login")]
@@ -121,25 +123,27 @@ namespace API.Controllers
                 message = "success"
             });
         }
-
         [HttpPost("forgot-password")]
-        public IActionResult ForgotPassword(ForgotPasswordDto dto)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         {
             var user = _repository.GetByEmail(dto.Email);
 
-            if (user == null) return BadRequest(new { message = "User not found!" }); // Don't reveal user existence
+            if (user == null)
+                return BadRequest(new { message = "User not found!" }); // Optional: generic message to avoid info disclosure
 
             // Generate reset token (valid for 1 hour)
             var resetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-            user.ResetToken = resetToken; // Store without encoding
+            user.ResetToken = resetToken;
             user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
 
             _repository.Update(user);
 
-            _emailService.SendPasswordResetEmail(user.Email, resetToken);
+            // ✅ Send email asynchronously
+            await _emailService.SendPasswordResetEmailAsync(user.Email, resetToken);
 
             return Ok(new { message = "Password reset email sent" });
         }
+
 
         [HttpPost("reset-password")]
         public IActionResult ResetPassword(ResetPasswordDto dto)

@@ -29,7 +29,7 @@ const TaskDetailsPanel = ({ task, assignees }: Props) => {
             <dt className="font-medium text-gray-900">Created at</dt>
             <dd className="text-gray-700 sm:col-span-2">
               {task.createdAt
-                ? new Date(task.createdAt).toLocaleString()
+                ? new Date(task.createdAt).toLocaleDateString()
                 : "No creation date"}
             </dd>
           </div>
@@ -38,7 +38,7 @@ const TaskDetailsPanel = ({ task, assignees }: Props) => {
             <dt className="font-medium text-gray-900">Due date</dt>
             <dd className="text-gray-700 sm:col-span-2">
               {task.dueDate
-                ? new Date(task.dueDate).toLocaleString()
+                ? new Date(task.dueDate).toLocaleDateString()
                 : "No due date"}
             </dd>
           </div>

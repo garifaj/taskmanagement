@@ -72,6 +72,11 @@ namespace API.Controllers
             try
             {
                 var jwt = Request.Cookies["jwt"];
+                if (string.IsNullOrEmpty(jwt))
+                {
+                    return Unauthorized("JWT token is missing.");
+                }
+
                 var token = _jwtService.Verify(jwt);
                 int userId = int.Parse(token.Issuer);
 
@@ -196,6 +201,10 @@ namespace API.Controllers
             {
                 //  Retrieve JWT from cookies
                 var jwt = Request.Cookies["jwt"];
+                if (string.IsNullOrEmpty(jwt))
+                {
+                    return Unauthorized("JWT token is missing.");
+                }
 
                 //  Verify token and extract user ID
                 var token = _jwtService.Verify(jwt);

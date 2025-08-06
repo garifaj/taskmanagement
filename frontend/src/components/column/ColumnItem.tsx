@@ -6,6 +6,8 @@ import TaskCard from "../task/TaskCard";
 import { useDroppable } from "@dnd-kit/core";
 import { useBoard } from "../../hooks/useBoard";
 import { UserContext } from "../../context/user/UserContext";
+import { useParams } from "react-router-dom";
+import { useProjectRole } from "../../hooks/useProjectRole";
 
 const ColumnItem = ({ column }: { column: ColumnType }) => {
   const { updateColumnName, deleteColumn, setColumns } = useBoard();
@@ -14,6 +16,8 @@ const ColumnItem = ({ column }: { column: ColumnType }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
   const { user } = useContext(UserContext);
+  const { projectId } = useParams();
+  const { role } = useProjectRole(projectId);
 
   const bgColor = isOver ? "bg-blue-100" : "bg-gray-100";
 
@@ -63,13 +67,15 @@ const ColumnItem = ({ column }: { column: ColumnType }) => {
             {column.name}
           </h2>
         )}
-        <ColumnMenu
-          columnId={column.id}
-          isActive={menuOpen}
-          onToggle={() => setMenuOpen((prev) => !prev)}
-          onEdit={() => setIsEditing(true)}
-          onDelete={handleDelete}
-        />
+        {role === "admin" && (
+          <ColumnMenu
+            columnId={column.id}
+            isActive={menuOpen}
+            onToggle={() => setMenuOpen((prev) => !prev)}
+            onEdit={() => setIsEditing(true)}
+            onDelete={handleDelete}
+          />
+        )}
       </div>
       {(column.tasks || [])
         .filter(
@@ -82,10 +88,12 @@ const ColumnItem = ({ column }: { column: ColumnType }) => {
         .map((task) => (
           <TaskCard key={task.id} task={task} />
         ))}
-      <CreateTaskButton
-        columnId={column.id}
-        onTaskCreated={handleTaskCreated}
-      />
+      {role === "admin" && (
+        <CreateTaskButton
+          columnId={column.id}
+          onTaskCreated={handleTaskCreated}
+        />
+      )}
     </div>
   );
 };
