@@ -47,7 +47,7 @@ namespace API.Controllers
                     .Include(pu => pu.Project)
                     .Select(pu => new
                     {
-                        pu.Project.Id,
+                        pu.Project!.Id,
                         pu.Project.Title,
                         pu.Role // User's role in the project
                     })
@@ -77,7 +77,7 @@ namespace API.Controllers
                         .Include(pu => pu.Project)
                         .Select(pu => new
                         {
-                            pu.Project.Id,
+                            pu.Project!.Id,
                             pu.Project.Title,
                             pu.Role
                         })

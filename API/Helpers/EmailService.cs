@@ -38,7 +38,7 @@ namespace API.Helpers
 
             using var client = new SmtpClient();
 
-            int smtpPort = int.Parse(_config["EmailSettings:SmtpPort"]);
+            int smtpPort = int.TryParse(_config["EmailSettings:SmtpPort"], out var port) ? port : throw new InvalidOperationException("SMTP port is not configured properly.");
             SecureSocketOptions options = smtpPort == 465
                 ? SecureSocketOptions.SslOnConnect
                 : SecureSocketOptions.StartTls;

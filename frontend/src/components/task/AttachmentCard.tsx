@@ -12,7 +12,7 @@ const AttachmentCard = ({ attachment, onDelete }: AttachmentCardProps) => {
     ? attachment.filePath.replace(/\\/g, "/")
     : "";
   const imageUrl = `http://localhost:5070/${normalizedUrl}`;
-  const downloadUrl = `${API_BASE_URL}/attachment/download-attachment/${attachment.id}`;
+  const downloadUrl = `${API_BASE_URL}/attachment/download/${attachment.id}`;
 
   return (
     <div className="relative border border-gray-300 rounded-lg shadow-sm p-2 flex flex-col h-35 w-35 ">

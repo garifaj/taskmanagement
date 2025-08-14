@@ -100,7 +100,7 @@ namespace API.Controllers
                 .Select(ta => new
                 {
                     ta.UserId,
-                    ta.User.Name,
+                    ta.User!.Name,
                     ta.User.Surname,
                     ta.User.Email
                 })

@@ -44,7 +44,7 @@ namespace API.Controllers
                     .Include(pu => pu.User)
                     .Select(pu => new
                     {
-                        pu.User.Id,
+                        pu.User!.Id,
                         pu.User.Name,
                         pu.User.Surname,
                         pu.User.Email,
@@ -85,7 +85,7 @@ namespace API.Controllers
                     .Where(pu => pu.UserId == userId)
                     .Select(pu => new
                     {
-                        pu.Project.Id,
+                        pu.Project!.Id,
                         pu.Project.Title,
                         pu.Project.Description,
                         pu.Project.CreatedAt
@@ -119,7 +119,7 @@ namespace API.Controllers
                         .Include(pu => pu.User)
                         .Select(pu => new
                         {
-                            pu.User.Id,
+                            pu.User!.Id,
                             pu.User.Name,
                             pu.User.Surname,
                             pu.User.Email,

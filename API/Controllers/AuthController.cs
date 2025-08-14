@@ -97,6 +97,11 @@ namespace API.Controllers
             {
                 var jwt = Request.Cookies["jwt"];
 
+                if (string.IsNullOrEmpty(jwt))
+                {
+                    return Unauthorized(new { message = "JWT token is missing or invalid." });
+                }
+
                 var token = _jwtService.Verify(jwt);
 
                 int userId = int.Parse(token.Issuer);

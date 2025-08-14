@@ -32,7 +32,7 @@ namespace API.Controllers
                 .Include(c => c.Tasks)
                     .ThenInclude(t => t.Attachments) // <-- include attachments here
                 .Include(c => c.Tasks)
-                    .ThenInclude(t => t.TaskAssignees)
+                    .ThenInclude(t => t.TaskAssignees!)
                         .ThenInclude(ta => ta.User)
                 .Include(c => c.Tasks)
                     .ThenInclude(t => t.Owner)    // <-- Add this line to include the owner
@@ -52,7 +52,7 @@ namespace API.Controllers
             .Include(c => c.Tasks)
                 .ThenInclude(t => t.Attachments)
             .Include(c => c.Tasks)
-                .ThenInclude(t => t.TaskAssignees)
+                .ThenInclude(t => t.TaskAssignees!)
                     .ThenInclude(ta => ta.User)
             .Include(c => c.Tasks)
                 .ThenInclude(t => t.Owner)    // <-- Add this line to include the owner
