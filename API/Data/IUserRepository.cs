@@ -4,11 +4,11 @@ namespace API.Data
 {
     public interface IUserRepository
     {
-        User Create(User user);
-        User GetByEmail(string email);
-        User GetById(int id);
-        User GetByResetToken(string token);
-        User GetByVerificationToken(string token);
-        User Update(User user);
+        Task<User> CreateAsync(User user);
+        Task<User?> GetByEmailAsync(string email);
+        Task<User?> GetByIdAsync(int id);
+        Task<User?> GetByResetTokenAsync(string token);
+        Task<User?> GetByVerificationTokenAsync(string token);
+        Task<User> UpdateAsync(User user);
     }
 }

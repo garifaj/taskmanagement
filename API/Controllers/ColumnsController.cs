@@ -39,6 +39,7 @@ namespace API.Controllers
                 .Include(c => c.Tasks)
                     .ThenInclude(t => t.Subtasks) 
                 .Include(c => c.Project)
+                .AsNoTracking()
                 .ToListAsync();
 
             return Ok(columns);
@@ -59,6 +60,7 @@ namespace API.Controllers
             .Include(c => c.Tasks)
                 .ThenInclude(t => t.Subtasks) 
             .Include(c => c.Project)
+            .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == columnId && c.ProjectId == projectId);
 
             if (column == null)
@@ -119,7 +121,7 @@ namespace API.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Column deleted.");
-        }
+        }   
 
         private bool ColumnExists(int id)
         {

@@ -37,7 +37,7 @@ namespace API.Controllers
                 int userId = int.Parse(token.Issuer);
 
                 // 3. Fetch the user
-                var user = _repository.GetById(userId);
+                var user = _repository.GetByIdAsync(userId);
                 if (user == null) return Unauthorized("User not found");
 
                 var columnExists = await _context.Columns.AnyAsync(c => c.Id == dto.ColumnId);

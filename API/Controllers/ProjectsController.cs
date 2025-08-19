@@ -211,7 +211,7 @@ namespace API.Controllers
                 int userId = int.Parse(token.Issuer);
 
                 //  Fetch the user from the repository
-                var user = _repository.GetById(userId);
+                var user = _repository.GetByIdAsync(userId);
                 if (user == null) return Unauthorized("User not found");
 
                 //  Create the new project

@@ -46,7 +46,7 @@ namespace API.Controllers
                 VerificationTokenExpiry = DateTime.UtcNow.AddHours(24)
             };
 
-            _repository.Create(user);
+            await _repository.CreateAsync(user);
 
             // ✅ Send verification email asynchronously
             await _emailService.SendVerificationEmailAsync(user.Email, user.VerificationToken);
@@ -57,9 +57,9 @@ namespace API.Controllers
 
 
         [HttpPost("login")]
-        public IActionResult Login(LoginDto dto)
+        public async Task<IActionResult> Login(LoginDto dto)
         {
-            var user = _repository.GetByEmail(dto.Email);
+            var user = await _repository.GetByEmailAsync(dto.Email);
 
             if (user == null)
             {
@@ -99,7 +99,7 @@ namespace API.Controllers
 
 
         [HttpGet("user")]
-        public IActionResult User()
+        public async Task<IActionResult> User()
         {
             try
             {
@@ -114,7 +114,7 @@ namespace API.Controllers
 
                 int userId = int.Parse(token.Issuer);
 
-                var user = _repository.GetById(userId);
+                var user = await _repository.GetByIdAsync(userId);
 
                 return Ok(user);
             }
@@ -139,7 +139,7 @@ namespace API.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         {
-            var user = _repository.GetByEmail(dto.Email);
+            var user = await _repository.GetByEmailAsync(dto.Email);
 
             if (user == null)
                 return BadRequest(new { message = "User not found!" }); // Optional: generic message to avoid info disclosure
@@ -149,7 +149,7 @@ namespace API.Controllers
             user.ResetToken = resetToken;
             user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
 
-            _repository.Update(user);
+            await _repository.UpdateAsync(user);
 
             // ✅ Send email asynchronously
             await _emailService.SendPasswordResetEmailAsync(user.Email, resetToken);
@@ -159,9 +159,9 @@ namespace API.Controllers
 
 
         [HttpPost("reset-password")]
-        public IActionResult ResetPassword(ResetPasswordDto dto)
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
         {
-            var user = _repository.GetByResetToken(dto.Token); // Use token directly
+            var user = await _repository.GetByResetTokenAsync(dto.Token); // Use token directly
 
             if (user == null || user.ResetTokenExpiry < DateTime.UtcNow)
                 return BadRequest(new { message = "Invalid or expired token" });
@@ -170,15 +170,15 @@ namespace API.Controllers
             user.ResetToken = null;
             user.ResetTokenExpiry = null;
 
-            _repository.Update(user);
+            await _repository.UpdateAsync(user);
 
             return Ok(new { message = "Password reset successful" });
         }
 
         [HttpPost("verify-email")]
-        public IActionResult VerifyEmail(VerifyEmailDto dto)
+        public async Task<IActionResult> VerifyEmail(VerifyEmailDto dto)
         {
-            var user = _repository.GetByVerificationToken(dto.Token);
+            var user = await _repository.GetByVerificationTokenAsync(dto.Token);
 
             if (user == null || user.VerificationTokenExpiry < DateTime.UtcNow)
                 return BadRequest(new { message = "Invalid or expired token" });
@@ -187,7 +187,7 @@ namespace API.Controllers
             user.VerificationToken = null;
             user.VerificationTokenExpiry = null;
 
-            _repository.Update(user);
+            await _repository.UpdateAsync(user);
 
             return Ok(new { message = "Email verified successfully!" });
         }
@@ -227,7 +227,7 @@ namespace API.Controllers
             }
 
             // If not found → create user with blank password & verified email
-            var user = _repository.GetByEmail(email);
+            var user = await _repository.GetByEmailAsync(email);
             if (user == null)
             {
                 // Fallback if given/surname are empty: try to split the displayName
@@ -250,7 +250,7 @@ namespace API.Controllers
                     VerificationTokenExpiry = null
                 };
 
-                _repository.Create(user);
+                await _repository.CreateAsync(user);
             }
 
             // Issue your own JWT
@@ -262,7 +262,7 @@ namespace API.Controllers
                 HttpOnly = true,
                 //Secure = true,          // requires HTTPS; set false only if testing on plain http
                 //SameSite = SameSiteMode.None, // needed if your frontend is a different origin
-                //Expires = DateTimeOffset.UtcNow.AddDays(1)
+                Expires = DateTimeOffset.UtcNow.AddHours(6)
             });
 
             // Redirect the user back to your frontend (could also include token as a query if you prefer)

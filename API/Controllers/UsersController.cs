@@ -160,7 +160,7 @@ namespace API.Controllers
                 VerificationTokenExpiry = DateTime.UtcNow.AddHours(24)
             };
 
-            _repository.Create(user);
+            await _repository.UpdateAsync(user);
 
             // ✅ Send email asynchronously
             await _emailService.SendVerificationEmailAsync(user.Email, user.VerificationToken);
