@@ -67,7 +67,6 @@ const LoginPage = () => {
       }
     }
   };
-
   return (
     <section className="bg-white">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
@@ -81,13 +80,27 @@ const LoginPage = () => {
 
         <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6 xl:px-30">
           <div className="max-w-xl lg:max-w-3xl">
-            <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+            <h1 className="mt-6 mb-5 text-center text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
               Sign in
             </h1>
-            <p className="mt-4 leading-relaxed text-gray-500">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi
-              nam dolorum aliquam, quibusdam aperiam voluptatum.
-            </p>
+            <a
+              href={`${API_BASE_URL}/login-google`}
+              className="flex items-center justify-center w-full py-4 mb-6 text-sm font-medium transition duration-300 rounded-2xl text-grey-900 bg-blue-50 hover:bg-blue-200 hover:cursor:pointer focus:ring-4 focus:ring-grey-300"
+            >
+              <img
+                className="h-5 mr-2"
+                src="https://raw.githubusercontent.com/Loopple/loopple-public-assets/main/motion-tailwind/img/logos/logo-google.png"
+                alt=""
+              />
+              Sign in with Google
+            </a>
+            <span className="flex items-center">
+              <span className="h-px flex-1 bg-gray-300"></span>
+
+              <span className="shrink-0 px-4 text-gray-900">or</span>
+
+              <span className="h-px flex-1 bg-gray-300"></span>
+            </span>
             <form
               onSubmit={handleRegisterSubmit}
               className="mt-8 grid grid-cols-6 gap-6"

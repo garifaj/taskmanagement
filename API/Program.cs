@@ -1,8 +1,11 @@
 using API.Data;
 using API.Helpers;
 using API.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +33,31 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // challenge = Google
+})
+.AddCookie() // holds the temp principal after Google signs in
+.AddGoogle(googleOptions =>
+{
+    // These must be present (user-secrets, appsettings, etc.)
+    var clientId = builder.Configuration["Authentication:Google:ClientId"];
+    var clientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+        throw new InvalidOperationException("Google authentication configuration is missing or invalid.");
+
+    googleOptions.ClientId = clientId;
+    googleOptions.ClientSecret = clientSecret;
+
+    // MUST match the Google Console Authorized redirect URI
+    googleOptions.CallbackPath = "/signin-google";
+
+    // Optional but helpful: keep tokens if you ever need them
+    googleOptions.SaveTokens = true;
+});
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<JwtService>();
@@ -50,11 +78,14 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseHttpsRedirection();
+app.UseCors("AllowLocalhost");
 
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 
 app.MapControllers();
-app.UseCors("AllowLocalhost");
+
 
 app.Run();

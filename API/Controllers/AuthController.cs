@@ -3,8 +3,13 @@ using API.DTOs.user;
 using API.Helpers;
 using API.Models;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -15,12 +20,15 @@ namespace API.Controllers
         private readonly IUserRepository _repository;
         private readonly JwtService _jwtService;
         private readonly EmailService _emailService;
+        private readonly string _frontendUrl;
 
-        public AuthController(IUserRepository repository, JwtService jwtService, EmailService emailService)
+
+        public AuthController(IUserRepository repository, JwtService jwtService, EmailService emailService, IConfiguration config)
         {
-            _repository = repository;
-            _jwtService = jwtService;
-            _emailService = emailService;
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _frontendUrl = config["FrontendGoogle:BaseUrl"] ?? throw new ArgumentNullException("FrontendGoogle:BaseUrl");
         }
 
         [HttpPost("register")]
@@ -182,6 +190,83 @@ namespace API.Controllers
             _repository.Update(user);
 
             return Ok(new { message = "Email verified successfully!" });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("login-google")]
+        public IActionResult LoginWithGoogle()
+        {
+            // After Google completes (to /signin-google), the cookie handler will
+            // sign the principal and then redirect here:
+            var redirectUrl = Url.Action(nameof(GoogleCallback), "Auth");
+            var props = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(props, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("google-callback")]
+        public async Task<IActionResult> GoogleCallback()
+        {
+            // Read the signed-in principal (issued by the Cookie handler after Google)
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!result.Succeeded || result.Principal is null)
+            {
+                return Redirect($"{_frontendUrl}/login?error=google-auth-failed");
+            }
+
+            // Claims you typically get from Google:
+            var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var givenName = result.Principal.FindFirst(ClaimTypes.GivenName)?.Value ?? "";
+            var familyName = result.Principal.FindFirst(ClaimTypes.Surname)?.Value ?? "";
+            var displayName = result.Principal.FindFirst(ClaimTypes.Name)?.Value ?? "";
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                // Some enterprise Google accounts may hide email; handle gracefully
+                 return Redirect($"{_frontendUrl}/login?error=no-email-returned");
+            }
+
+            // If not found → create user with blank password & verified email
+            var user = _repository.GetByEmail(email);
+            if (user == null)
+            {
+                // Fallback if given/surname are empty: try to split the displayName
+                if (string.IsNullOrWhiteSpace(givenName) && string.IsNullOrWhiteSpace(familyName) && !string.IsNullOrWhiteSpace(displayName))
+                {
+                    var parts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length > 0) givenName = parts[0];
+                    if (parts.Length > 1) familyName = string.Join(' ', parts.Skip(1));
+                }
+
+                user = new User
+                {
+                    Name = givenName,
+                    Surname = familyName,
+                    Email = email,
+                    Password = "",                 // blank password for Google users
+                    isSuperAdmin = false,
+                    IsEmailVerified = true,        // Google verified
+                    VerificationToken = null,
+                    VerificationTokenExpiry = null
+                };
+
+                _repository.Create(user);
+            }
+
+            // Issue your own JWT
+            var jwt = _jwtService.Generate(user.Id);
+
+            // Store as HttpOnly cookie for your React app to use
+            Response.Cookies.Append("jwt", jwt, new CookieOptions
+            {
+                HttpOnly = true,
+                //Secure = true,          // requires HTTPS; set false only if testing on plain http
+                //SameSite = SameSiteMode.None, // needed if your frontend is a different origin
+                //Expires = DateTimeOffset.UtcNow.AddDays(1)
+            });
+
+            // Redirect the user back to your frontend (could also include token as a query if you prefer)
+            return Redirect($"{_frontendUrl}/");
         }
     }
 }
