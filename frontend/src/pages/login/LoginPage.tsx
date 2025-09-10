@@ -10,6 +10,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<LoginErrors>({
     email: "",
     password: "",
@@ -23,6 +24,7 @@ const LoginPage = () => {
 
   const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     const validationErrors: LoginErrors = {};
 
     // Validate email format
@@ -60,11 +62,13 @@ const LoginPage = () => {
       if (error instanceof AxiosError && error.response?.data?.message) {
         setErrors({
           email: "",
-          password: error.response.data.message, // Show error message
+          password: error.response.data.message,
         });
       } else {
         console.error("Login error:", error);
       }
+    } finally {
+      setLoading(false); // Re-enable the button after the request finishes
     }
   };
   return (
@@ -166,9 +170,14 @@ const LoginPage = () => {
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                 <button
                   type="submit"
-                  className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:cursor-pointer hover:bg-transparent hover:text-blue-600"
+                  disabled={loading}
+                  className={`inline-block shrink-0 rounded-md border px-12 py-3 text-sm font-medium transition ${
+                    loading
+                      ? "border-blue-200 bg-blue-200 text-white cursor-not-allowed"
+                      : "border-blue-600 bg-blue-600 text-white hover:bg-transparent hover:text-blue-600"
+                  }`}
                 >
-                  Sign in
+                  {loading ? "Signing in..." : "Sign in"}
                 </button>
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   Already have an account?{" "}
