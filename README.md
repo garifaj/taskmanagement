@@ -1,7 +1,5 @@
 # Task management app
 
-![A professional-looking dashboard with charts and a kanban board, showcasing the app's features.](placeholder-image-url)
-
 Task management web application designed to streamline project and team collaboration. It provides a robust and intuitive platform for managing projects, tasks, and subtasks, with powerful features tailored for both individual users and teams.
 
 ---
